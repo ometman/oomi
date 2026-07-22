@@ -1,0 +1,819 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+// Sample ministries data - in a real application, this would come from a CMS or database
+const ministries = [
+  {
+    id: 1,
+    name: "Youth Ministry",
+    category: "Age Groups",
+    description: "Empowering the next generation to live boldly for Christ through dynamic worship, relevant teaching, and meaningful relationships.",
+    leader: "Elder Michael Asante",
+    meetingTime: "Saturdays 4:00 PM - 6:00 PM",
+    ageGroup: "Ages 13-25",
+    activities: ["Weekly youth service", "Bible study groups", "Youth camps", "Community service projects", "Leadership training"],
+    image: "https://images.pexels.com/photos/7551659/pexels-photo-7551659.jpeg?auto=compress&cs=tinysrgb&w=800",
+    featured: true,
+    memberCount: "50+",
+    color: "primary"
+  },
+  {
+    id: 2,
+    name: "Women's Ministry",
+    category: "Gender Specific",
+    description: "A supportive community where women grow in faith, build lasting friendships, and discover their God-given purpose.",
+    leader: "Pastor Sarah Johnson",
+    meetingTime: "3rd Saturday of each month, 10:00 AM",
+    ageGroup: "All adult women",
+    activities: ["Monthly fellowship meetings", "Bible study groups", "Prayer circles", "Community outreach", "Mentorship programs"],
+    image: "https://images.pexels.com/photos/7551426/pexels-photo-7551426.jpeg?auto=compress&cs=tinysrgb&w=800",
+    featured: true,
+    memberCount: "35+",
+    color: "secondary"
+  },
+  {
+    id: 3,
+    name: "Men's Ministry",
+    category: "Gender Specific",
+    description: "Building godly men who lead with integrity, serve with passion, and impact their families and communities for Christ.",
+    leader: "Deacon James Osei",
+    meetingTime: "1st Saturday of each month, 7:00 AM",
+    ageGroup: "All adult men",
+    activities: ["Monthly breakfast meetings", "Men's retreats", "Mentorship programs", "Community service", "Sports fellowship"],
+    image: "https://images.pexels.com/photos/8468722/pexels-photo-8468722.jpeg?auto=compress&cs=tinysrgb&w=800",
+    featured: false,
+    memberCount: "25+",
+    color: "primary"
+  },
+  {
+    id: 4,
+    name: "Children's Ministry",
+    category: "Age Groups",
+    description: "Creating a fun, safe environment where children learn about God's love through age-appropriate activities and teaching.",
+    leader: "Sister Grace Mensah",
+    meetingTime: "Sundays during main service",
+    ageGroup: "Ages 3-12",
+    activities: ["Sunday school", "Children's church", "Vacation Bible school", "Christmas programs", "Fun activities"],
+    image: "https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg?auto=compress&cs=tinysrgb&w=800",
+    featured: false,
+    memberCount: "40+",
+    color: "secondary"
+  },
+  {
+    id: 5,
+    name: "Worship Ministry",
+    category: "Service",
+    description: "Leading the congregation in heartfelt worship through music, creating an atmosphere where people can encounter God.",
+    leader: "Brother Samuel Adjei",
+    meetingTime: "Thursdays 7:00 PM (Practice)",
+    ageGroup: "All ages with musical gifts",
+    activities: ["Sunday worship leading", "Special event performances", "Music training", "Choir practice", "Instrument lessons"],
+    image: "https://images.pexels.com/photos/8468730/pexels-photo-8468730.jpeg?auto=compress&cs=tinysrgb&w=800",
+    featured: true,
+    memberCount: "20+",
+    color: "primary"
+  },
+  {
+    id: 6,
+    name: "Prayer Ministry",
+    category: "Spiritual",
+    description: "Interceding for our church, community, and nation through organized prayer initiatives and spiritual warfare.",
+    leader: "Sister Mary Boateng",
+    meetingTime: "Fridays 6:00 PM - 7:00 PM",
+    ageGroup: "All ages",
+    activities: ["Weekly prayer meetings", "Prayer chains", "Intercessory prayer", "Healing prayer", "Fasting programs"],
+    image: "https://images.pexels.com/photos/5206040/pexels-photo-5206040.jpeg?auto=compress&cs=tinysrgb&w=800",
+    featured: false,
+    memberCount: "30+",
+    color: "secondary"
+  },
+  {
+    id: 7,
+    name: "Outreach Ministry",
+    category: "Service",
+    description: "Reaching our community with God's love through practical service, evangelism, and compassionate care.",
+    leader: "Deacon Peter Asante",
+    meetingTime: "Last Saturday of each month",
+    ageGroup: "All ages",
+    activities: ["Community service", "Food distribution", "Medical outreach", "Evangelism", "Prison ministry"],
+    image: "https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=800",
+    featured: false,
+    memberCount: "45+",
+    color: "primary"
+  },
+  {
+    id: 8,
+    name: "Hospitality Ministry",
+    category: "Service",
+    description: "Creating a welcoming environment for all visitors and members through warm greetings and excellent service.",
+    leader: "Sister Joyce Amponsah",
+    meetingTime: "Sundays before and after service",
+    ageGroup: "All ages",
+    activities: ["Greeting visitors", "Ushering", "Event coordination", "Refreshment service", "Facility management"],
+    image: "https://images.pexels.com/photos/8468722/pexels-photo-8468722.jpeg?auto=compress&cs=tinysrgb&w=800",
+    featured: false,
+    memberCount: "15+",
+    color: "secondary"
+  },
+  {
+    id: 9,
+    name: "Media Ministry",
+    category: "Service",
+    description: "Supporting church services and events through audio-visual technology, live streaming, and digital content creation.",
+    leader: "Brother David Owusu",
+    meetingTime: "Sundays and special events",
+    ageGroup: "Tech-savvy individuals",
+    activities: ["Sound engineering", "Video production", "Live streaming", "Photography", "Social media management"],
+    image: "https://images.pexels.com/photos/7551659/pexels-photo-7551659.jpeg?auto=compress&cs=tinysrgb&w=800",
+    featured: false,
+    memberCount: "10+",
+    color: "primary"
+  }
+];
+
+const ministryCategories = [
+  { name: "All Ministries", value: "all", color: "neutral" },
+  { name: "Age Groups", value: "age-groups", color: "primary" },
+  { name: "Gender Specific", value: "gender-specific", color: "secondary" },
+  { name: "Service", value: "service", color: "primary" },
+  { name: "Spiritual", value: "spiritual", color: "secondary" }
+];
+
+const leadershipTeam = [
+  {
+    name: "Pastor John Doe",
+    role: "Senior Pastor",
+    ministry: "Overall Leadership",
+    bio: "Leading Omet Omeni Ministries with passion for God's Word and heart for the community.",
+    image: "primary"
+  },
+  {
+    name: "Pastor Sarah Johnson",
+    role: "Associate Pastor",
+    ministry: "Women's Ministry",
+    bio: "Empowering women to discover their purpose and grow in their faith journey.",
+    image: "secondary"
+  },
+  {
+    name: "Elder Michael Asante",
+    role: "Youth Pastor & Elder",
+    ministry: "Youth Ministry",
+    bio: "Passionate about raising the next generation of Christian leaders.",
+    image: "primary"
+  },
+  {
+    name: "Deacon James Osei",
+    role: "Deacon",
+    ministry: "Men's Ministry",
+    bio: "Building godly men who impact their families and communities.",
+    image: "secondary"
+  }
+];
+
+const volunteerOpportunities = [
+  {
+    title: "Sunday Service Support",
+    description: "Help with setup, greeting, ushering, and general service coordination",
+    timeCommitment: "2-3 hours on Sundays",
+    skills: "Friendly personality, punctuality",
+    contact: "hello@ometomeni.org"
+  },
+  {
+    title: "Children's Ministry Helper",
+    description: "Assist with children's programs, activities, and supervision",
+    timeCommitment: "2 hours on Sundays",
+    skills: "Love for children, patience",
+    contact: "hello@ometomeni.org"
+  },
+  {
+    title: "Technical Support",
+    description: "Audio/visual support for services and events",
+    timeCommitment: "Flexible schedule",
+    skills: "Basic technical knowledge",
+    contact: "hello@ometomeni.org"
+  },
+  {
+    title: "Community Outreach",
+    description: "Participate in community service projects and evangelism",
+    timeCommitment: "Monthly events",
+    skills: "Heart for service, compassion",
+    contact: "hello@ometomeni.org"
+  }
+];
+---
+
+<Layout 
+  title="Ministries & Involvement | Omet Omeni Ministries - Find Your Place to Serve" 
+  description="Discover ministry opportunities at Omet Omeni Ministries in Kumasi, Ghana. Join our youth, women's, men's, children's, worship, prayer, and outreach ministries. Find your place to serve and grow."
+>
+  <Header />
+  
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-neutral-900 mb-6">
+          Ministries & <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-secondary-600">Involvement</span>
+        </h1>
+        <p class="text-xl text-neutral-600 max-w-3xl mx-auto mb-8">
+          Discover your place to serve, grow, and make a difference. Every member has unique gifts that can impact our church and community.
+        </p>
+        
+        <!-- Ministry Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto">
+          <div class="bg-white p-4 rounded-lg shadow-md border border-neutral-100">
+            <div class="text-2xl font-bold text-primary-600">{ministries.length}</div>
+            <div class="text-neutral-600 text-sm">Active Ministries</div>
+          </div>
+          <div class="bg-white p-4 rounded-lg shadow-md border border-neutral-100">
+            <div class="text-2xl font-bold text-secondary-600">200+</div>
+            <div class="text-neutral-600 text-sm">Volunteers Serving</div>
+          </div>
+          <div class="bg-white p-4 rounded-lg shadow-md border border-neutral-100">
+            <div class="text-2xl font-bold text-primary-600">12</div>
+            <div class="text-neutral-600 text-sm">Ministry Leaders</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Ministries -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
+          Featured Ministries
+        </h2>
+        <p class="text-xl text-neutral-600">
+          Explore our most active and impactful ministry opportunities
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {ministries.filter(ministry => ministry.featured).map((ministry) => (
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 border border-neutral-100">
+            <div class="relative h-64">
+              <img 
+                src={ministry.image} 
+                alt={ministry.name}
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute inset-0 bg-black/40"></div>
+              <div class="absolute bottom-4 left-4 right-4">
+                <div class="flex items-center justify-between">
+                  <span class={`px-3 py-1 rounded-full text-sm font-medium ${
+                    ministry.color === 'primary' 
+                      ? 'bg-primary-600 text-white' 
+                      : 'bg-secondary-600 text-white'
+                  }`}>
+                    {ministry.category}
+                  </span>
+                  <span class="bg-white/90 backdrop-blur-sm text-neutral-800 px-2 py-1 rounded-full text-sm font-medium">
+                    {ministry.memberCount} members
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="p-8">
+              <h3 class="text-2xl font-bold text-neutral-900 mb-3">{ministry.name}</h3>
+              
+              <div class="space-y-2 mb-4 text-sm text-neutral-600">
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  Led by {ministry.leader}
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  {ministry.meetingTime}
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                  {ministry.ageGroup}
+                </div>
+              </div>
+              
+              <p class="text-neutral-600 mb-6 leading-relaxed">{ministry.description}</p>
+              
+              <div class="mb-6">
+                <h4 class="font-semibold text-neutral-900 mb-3">What We Do:</h4>
+                <ul class="space-y-1">
+                  {ministry.activities.slice(0, 3).map((activity) => (
+                    <li class="flex items-center text-sm text-neutral-600">
+                      <svg class="w-3 h-3 text-primary-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                      </svg>
+                      {activity}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <button class={`w-full py-3 px-6 font-semibold rounded-lg transition-colors ${
+                ministry.color === 'primary'
+                  ? 'bg-primary-600 text-white hover:bg-primary-700'
+                  : 'bg-secondary-600 text-white hover:bg-secondary-700'
+              }`}>
+                Learn More & Join
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- All Ministries with Filter -->
+  <section class="py-20 bg-neutral-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
+          All Ministry Opportunities
+        </h2>
+        <p class="text-xl text-neutral-600 mb-8">
+          Find the perfect place to use your gifts and serve God's kingdom
+        </p>
+        
+        <!-- Category Filter -->
+        <div class="flex flex-wrap justify-center gap-3 mb-12">
+          {ministryCategories.map((category) => (
+            <button 
+              class={`px-4 py-2 rounded-full text-sm font-medium transition-colors filter-btn ${
+                category.color === 'primary' 
+                  ? 'bg-primary-100 text-primary-700 hover:bg-primary-200' 
+                  : category.color === 'secondary'
+                  ? 'bg-secondary-100 text-secondary-700 hover:bg-secondary-200'
+                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+              }`}
+              data-category={category.value}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      <!-- Ministries Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="ministries-grid">
+        {ministries.map((ministry) => (
+          <div 
+            class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 ministry-card"
+            data-category={ministry.category.toLowerCase().replace(/\s+/g, '-')}
+          >
+            <div class="relative h-48">
+              <img 
+                src={ministry.image} 
+                alt={ministry.name}
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute top-3 left-3">
+                <span class="bg-white/90 backdrop-blur-sm text-neutral-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {ministry.category}
+                </span>
+              </div>
+              <div class="absolute top-3 right-3 bg-black/60 text-white rounded px-2 py-1">
+                <span class="text-xs font-medium">{ministry.memberCount}</span>
+              </div>
+            </div>
+            
+            <div class="p-6">
+              <h3 class="text-lg font-semibold text-neutral-900 mb-2">{ministry.name}</h3>
+              
+              <div class="space-y-1 mb-3 text-sm text-neutral-600">
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  {ministry.leader}
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  {ministry.meetingTime}
+                </div>
+              </div>
+              
+              <p class="text-neutral-600 text-sm mb-4 line-clamp-3">{ministry.description}</p>
+              
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-neutral-500">{ministry.ageGroup}</span>
+                <button class={`text-sm font-medium transition-colors ${
+                  ministry.color === 'primary'
+                    ? 'text-primary-600 hover:text-primary-700'
+                    : 'text-secondary-600 hover:text-secondary-700'
+                }`}>
+                  Learn More →
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Leadership Team -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
+          Ministry Leadership
+        </h2>
+        <p class="text-xl text-neutral-600">
+          Meet the dedicated leaders who guide and shepherd our various ministries
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {leadershipTeam.map((leader, index) => (
+          <div class="text-center group">
+            <div class={`w-24 h-24 mx-auto mb-4 rounded-2xl flex items-center justify-center ${
+              leader.image === 'primary' 
+                ? 'bg-gradient-to-br from-primary-500 to-primary-600' 
+                : 'bg-gradient-to-br from-secondary-500 to-secondary-600'
+            } group-hover:scale-110 transition-transform duration-200`}>
+              <span class="text-white font-bold text-xl">{leader.name.split(' ').map(n => n[0]).join('')}</span>
+            </div>
+            <h3 class="text-lg font-semibold text-neutral-900 mb-1">{leader.name}</h3>
+            <p class="text-primary-600 font-medium mb-2">{leader.role}</p>
+            <p class="text-sm text-neutral-600 mb-3">{leader.ministry}</p>
+            <p class="text-xs text-neutral-500 leading-relaxed">{leader.bio}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Volunteer Opportunities -->
+  <section class="py-20 bg-gradient-to-br from-primary-50 to-secondary-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
+          Volunteer Opportunities
+        </h2>
+        <p class="text-xl text-neutral-600">
+          Start serving today! Here are some immediate ways you can get involved
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {volunteerOpportunities.map((opportunity, index) => (
+          <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div class="flex items-start">
+              <div class={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 flex-shrink-0 ${
+                index % 2 === 0 
+                  ? 'bg-primary-100 text-primary-600' 
+                  : 'bg-secondary-100 text-secondary-600'
+              }`}>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-xl font-semibold text-neutral-900 mb-3">{opportunity.title}</h3>
+                <p class="text-neutral-600 mb-4">{opportunity.description}</p>
+                
+                <div class="space-y-2 mb-4 text-sm">
+                  <div class="flex items-center text-neutral-600">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <strong>Time:</strong> {opportunity.timeCommitment}
+                  </div>
+                  <div class="flex items-center text-neutral-600">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    <strong>Skills:</strong> {opportunity.skills}
+                  </div>
+                </div>
+                
+                <a 
+                  href={`mailto:${opportunity.contact}`}
+                  class={`inline-flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${
+                    index % 2 === 0
+                      ? 'bg-primary-600 text-white hover:bg-primary-700'
+                      : 'bg-secondary-600 text-white hover:bg-secondary-700'
+                  }`}
+                >
+                  Get Involved
+                  <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Ministry Application -->
+  <section class="py-20 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-br from-primary-50 to-secondary-50 rounded-2xl p-8 lg:p-12">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-display font-bold text-neutral-900 mb-4">
+            Ready to Get Involved?
+          </h2>
+          <p class="text-xl text-neutral-600">
+            Fill out our ministry interest form and we'll help you find the perfect place to serve
+          </p>
+        </div>
+        
+        <form class="space-y-6" id="ministry-form">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="full-name" class="block text-sm font-medium text-neutral-700 mb-2">Full Name</label>
+              <input 
+                type="text" 
+                id="full-name" 
+                name="full-name" 
+                required
+                class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                placeholder="Your full name"
+              />
+            </div>
+            <div>
+              <label for="email" class="block text-sm font-medium text-neutral-700 mb-2">Email Address</label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                required
+                class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                placeholder="your.email@example.com"
+              />
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="phone" class="block text-sm font-medium text-neutral-700 mb-2">Phone Number</label>
+              <input 
+                type="tel" 
+                id="phone" 
+                name="phone"
+                class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                placeholder="+233-XXX-XXXX"
+              />
+            </div>
+            <div>
+              <label for="age-group" class="block text-sm font-medium text-neutral-700 mb-2">Age Group</label>
+              <select 
+                id="age-group" 
+                name="age-group" 
+                required
+                class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+              >
+                <option value="">Select your age group</option>
+                <option value="13-17">13-17 years</option>
+                <option value="18-25">18-25 years</option>
+                <option value="26-35">26-35 years</option>
+                <option value="36-50">36-50 years</option>
+                <option value="51+">51+ years</option>
+              </select>
+            </div>
+          </div>
+          
+          <div>
+            <label for="ministry-interest" class="block text-sm font-medium text-neutral-700 mb-2">Ministry Interest</label>
+            <select 
+              id="ministry-interest" 
+              name="ministry-interest" 
+              required
+              class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+            >
+              <option value="">Select a ministry</option>
+              {ministries.map((ministry) => (
+                <option value={ministry.name}>{ministry.name}</option>
+              ))}
+              <option value="multiple">Multiple ministries</option>
+              <option value="unsure">Not sure yet</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="skills" class="block text-sm font-medium text-neutral-700 mb-2">Skills & Talents</label>
+            <textarea 
+              id="skills" 
+              name="skills" 
+              rows="3" 
+              class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors resize-none"
+              placeholder="Tell us about your skills, talents, or areas of interest..."
+            ></textarea>
+          </div>
+          
+          <div>
+            <label for="availability" class="block text-sm font-medium text-neutral-700 mb-2">Availability</label>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <label class="flex items-center">
+                <input type="checkbox" name="availability" value="sunday" class="mr-2 text-primary-600 focus:ring-primary-500">
+                <span class="text-sm">Sunday</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" name="availability" value="weekday" class="mr-2 text-primary-600 focus:ring-primary-500">
+                <span class="text-sm">Weekdays</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" name="availability" value="evening" class="mr-2 text-primary-600 focus:ring-primary-500">
+                <span class="text-sm">Evenings</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" name="availability" value="weekend" class="mr-2 text-primary-600 focus:ring-primary-500">
+                <span class="text-sm">Weekends</span>
+              </label>
+            </div>
+          </div>
+          
+          <div>
+            <label for="message" class="block text-sm font-medium text-neutral-700 mb-2">Additional Information</label>
+            <textarea 
+              id="message" 
+              name="message" 
+              rows="4" 
+              class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors resize-none"
+              placeholder="Tell us more about your heart for ministry and how you'd like to serve..."
+            ></textarea>
+          </div>
+          
+          <button 
+            type="submit"
+            class="w-full bg-primary-600 text-white font-semibold py-4 px-6 rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-colors"
+          >
+            <span class="flex items-center justify-center">
+              Submit Application
+              <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="py-20 bg-gradient-to-br from-primary-600 to-secondary-600 text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="space-y-8">
+        <div>
+          <h2 class="text-3xl sm:text-4xl font-display font-bold mb-4">
+            Your Ministry Journey Starts Here
+          </h2>
+          <p class="text-xl opacity-90">
+            God has given you unique gifts and talents. Let's discover how you can use them to serve His kingdom and bless others.
+          </p>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a 
+            href="/contact" 
+            class="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 font-semibold rounded-lg hover:bg-neutral-100 transition-colors"
+          >
+            Contact Ministry Leaders
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+          </a>
+          <a 
+            href="/events" 
+            class="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-semibold rounded-lg border-2 border-white/30 hover:bg-white/10 transition-colors"
+          >
+            View Ministry Events
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Layout>
+
+<script>
+  // Ministry filtering functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const ministryCards = document.querySelectorAll('.ministry-card');
+    
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const category = this.getAttribute('data-category');
+        
+        // Update active button
+        filterButtons.forEach(btn => {
+          btn.classList.remove('bg-primary-600', 'text-white', 'bg-secondary-600', 'bg-neutral-600');
+          if (btn.classList.contains('bg-primary-100')) {
+            btn.classList.add('bg-primary-100', 'text-primary-700');
+          } else if (btn.classList.contains('bg-secondary-100')) {
+            btn.classList.add('bg-secondary-100', 'text-secondary-700');
+          } else {
+            btn.classList.add('bg-neutral-100', 'text-neutral-700');
+          }
+        });
+        
+        if (this.classList.contains('bg-primary-100')) {
+          this.classList.remove('bg-primary-100', 'text-primary-700');
+          this.classList.add('bg-primary-600', 'text-white');
+        } else if (this.classList.contains('bg-secondary-100')) {
+          this.classList.remove('bg-secondary-100', 'text-secondary-700');
+          this.classList.add('bg-secondary-600', 'text-white');
+        } else {
+          this.classList.remove('bg-neutral-100', 'text-neutral-700');
+          this.classList.add('bg-neutral-600', 'text-white');
+        }
+        
+        // Filter ministries
+        ministryCards.forEach(card => {
+          if (category === 'all' || card.getAttribute('data-category') === category) {
+            card.style.display = 'block';
+            card.classList.add('animate-fade-in');
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+    
+    // Ministry application form handling
+    const ministryForm = document.getElementById('ministry-form');
+    ministryForm?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const button = this.querySelector('button[type="submit"]');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = `
+        <span class="flex items-center justify-center">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Submitting...
+        </span>
+      `;
+      
+      // Simulate form submission
+      setTimeout(() => {
+        button.innerHTML = `
+          <span class="flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Application Submitted!
+          </span>
+        `;
+        
+        // Reset form
+        this.reset();
+        
+        // Reset button after 3 seconds
+        setTimeout(() => {
+          button.innerHTML = originalText;
+        }, 3000);
+      }, 2000);
+    });
+    
+    // Learn more button functionality - Fixed selector
+    const allButtons = document.querySelectorAll('button');
+    const learnMoreButtons = Array.from(allButtons).filter(button => 
+      button.textContent.includes('Learn More')
+    );
+    
+    learnMoreButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // In a real application, this would open a modal or navigate to a detailed page
+        alert('Ministry details modal would open here. This would show more information about the ministry, meeting times, requirements, and contact information.');
+      });
+    });
+  });
+</script>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
