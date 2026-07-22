@@ -1,0 +1,298 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import PlanVisitForm from '../components/PlanVisitForm.astro';
+import { Image } from 'astro:assets';
+import planVisitCommunityHero from '../assets/plan-visit-community-hero.png';
+import { getUpcomingApprovedEvents } from '../data/events';
+import { ministryLocations } from '../data/locations';
+
+const upcomingEvents = getUpcomingApprovedEvents();
+const localOffices = ministryLocations.filter((location) => location.id !== 'ONLINE');
+const onlineLocation = ministryLocations.find((location) => location.id === 'ONLINE')!;
+const formatDate = (date: string) => new Intl.DateTimeFormat('en-GH', { dateStyle: 'long' }).format(new Date(`${date}T12:00:00`));
+const formatLabel = (value: string) => value.replaceAll('_', ' ').toLowerCase().replace(/^\w/, (letter) => letter.toUpperCase());
+
+const connectionOptions = [
+  { type: 'IN_PERSON_EVENT', title: 'Attend a Ministry Programme', description: 'Register for an upcoming worship gathering, teaching programme, conference, prayer meeting or special ministry event.', action: 'Plan to attend' },
+  { type: 'OFFICE_APPOINTMENT', title: 'Visit an Office', description: 'Request an appointment at our Accra or Kumasi office for ministry, partnership, administrative or pastoral enquiries.', action: 'Request an appointment' },
+  { type: 'ONLINE_EVENT', title: 'Connect Online', description: 'Join livestreams, online prayer, teaching sessions, discipleship programmes and digital ministry communities.', action: 'Connect online' },
+  { type: 'PRAYER_REQUEST', title: 'Request Prayer', description: 'Share a prayer request and choose how you would like the ministry to respond.', action: 'Request prayer' },
+] as const;
+
+const expectations = [
+  ['A Warm Welcome', 'Our team will help you understand the programme and find an appropriate next step.', 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z'],
+  ['Biblical Teaching and Prayer', 'Programmes are centred on responsible biblical teaching, prayer, worship and practical spiritual growth.', 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'],
+  ['A Respectful Environment', 'A visitor will not be forced to give money, speak publicly or disclose private information.', 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9c0-1.042-.133-2.052-.382-3.016z'],
+  ['Clear Next Steps', 'You may choose whether to register, request care, explore teaching resources or simply learn more.', 'M13 7l5 5m0 0l-5 5m5-5H6'],
+  ['Children and Family Information', 'Children’s arrangements depend on the selected event. Review its details and complete any event-specific registration.', 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m9.288 0a5.002 5.002 0 00-9.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
+  ['Accessibility and Practical Information', 'Share access needs in the form so the team can explain what support is available for the selected programme.', 'M12 8c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm0 2v10m-4-7h8m-6 7l-2 2m6-2l2 2'],
+];
+
+const faqs = [
+  ['Do I need to register before attending?', 'Registration depends on the programme. Register when requested so the team can share confirmed venue, timing and practical details.'],
+  ['Is an office appointment automatically confirmed?', 'No. An appointment request must be reviewed and confirmed before you travel to an office.'],
+  ['Can I join online?', 'Yes. Confirmed online programmes will explain how to register and when access instructions will be provided.'],
+  ['Is there a fee to attend?', 'Any approved fee will be stated clearly in the programme information before registration. Do not make payment through an unverified channel.'],
+  ['Will I be required to give an offering?', 'No. A visitor will not be forced to give money. Any opportunity to give should be voluntary and clearly explained.'],
+  ['Can I bring children?', 'This depends on the programme and its safeguarding arrangements. Include children in your request and wait for event-specific guidance.'],
+  ['What should I wear?', 'Wear something comfortable and appropriate for the programme. No special dress is required unless an event explicitly states otherwise.'],
+  ['Can I meet Omet Omeni personally?', 'Requests involving the ministry leader are reviewed according to purpose, availability and ministry priorities. Submission does not guarantee a personal appointment.'],
+  ['Can I submit a private prayer request?', 'Yes. Requests are restricted to authorised workers, subject to the stated safeguarding limitation where serious safety concerns arise.'],
+  ['What happens to my personal information?', 'It should be used only to respond to your request, protected by appropriate access controls, and retained according to the ministry’s approved data policy.'],
+];
+---
+
+<Layout
+  title="Plan Your Visit | Omet Omeni Ministries"
+  description="Plan your visit to an Omet Omeni Ministries programme in Accra, Kumasi or online. Register for events, request an office appointment or connect for prayer."
+>
+  <Header />
+  <main id="main-content">
+    <section class="relative overflow-hidden bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900 text-white">
+      <div class="absolute inset-0" aria-hidden="true">
+        <Image src={planVisitCommunityHero} alt="" format="webp" quality={82} loading="eager" class="h-full w-full object-cover object-[65%_center] sm:object-[70%_center]" />
+        <div class="absolute inset-0 bg-gradient-to-r from-neutral-900/95 via-primary-900/80 to-primary-900/25"></div>
+        <div class="absolute inset-0 bg-neutral-900/15"></div>
+      </div>
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
+        <div class="max-w-4xl">
+          <p class="text-sm font-semibold uppercase tracking-[0.2em] text-secondary-200">Connect with the ministry</p>
+          <h1 class="mt-4 text-4xl sm:text-5xl lg:text-6xl font-display font-bold leading-tight">Plan Your Visit</h1>
+          <p class="mt-6 max-w-3xl text-lg sm:text-xl leading-relaxed text-primary-50">We would be honoured to connect with you. Join an Omet Omeni Ministries programme in Accra, Kumasi or online, request an office appointment, or let us know how we can support you in prayer.</p>
+          <div class="mt-8 flex flex-col sm:flex-row flex-wrap gap-4">
+            <button data-select-type="IN_PERSON_EVENT" type="button" class="rounded-lg bg-white px-6 py-3.5 font-semibold text-primary-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-800">Plan to Attend</button>
+            <button data-select-type="OFFICE_APPOINTMENT" type="button" class="hidden sm:inline-flex rounded-lg border-2 border-white/60 px-6 py-3.5 font-semibold text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">Request an Office Appointment</button>
+            <button data-select-type="ONLINE_EVENT" type="button" class="hidden sm:inline-flex rounded-lg border-2 border-white/60 px-6 py-3.5 font-semibold text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">Connect Online</button>
+            <a href="#connection-options" class="sm:hidden text-center font-semibold text-white underline decoration-white/50 underline-offset-4 focus:outline-none focus:ring-2 focus:ring-white">See other ways to connect</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="connection-options" class="scroll-mt-24 border-t border-primary-100/70 py-20 bg-gradient-to-b from-white via-primary-50/60 to-white" aria-labelledby="connections-heading">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl">
+          <p class="text-sm font-semibold uppercase tracking-wider text-primary-600">Choose your path</p>
+          <h2 id="connections-heading" class="mt-3 text-3xl sm:text-4xl font-display font-bold text-neutral-900">How would you like to connect?</h2>
+        </div>
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+          {connectionOptions.map((option, index) => (
+            <article data-connect-card class="connect-card rounded-2xl border border-primary-100 bg-gradient-to-br from-white via-primary-50/40 to-secondary-50/60 p-8 shadow-[0_18px_50px_-28px_rgba(30,64,175,0.45)] hover:shadow-[0_24px_60px_-28px_rgba(30,64,175,0.6)]" style={`--reveal-delay: ${index * 90}ms`}>
+              <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-primary-200 text-xl font-bold text-primary-700 shadow-sm" aria-hidden="true">{index + 1}</div>
+              <h3 class="mt-6 text-2xl font-semibold text-neutral-900">{option.title}</h3>
+              <p class="mt-3 leading-relaxed text-neutral-600">{option.description}</p>
+              <button data-select-type={option.type} type="button" class="mt-6 font-semibold text-primary-700 underline decoration-primary-300 underline-offset-4 hover:text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500">{option.action}</button>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="border-t border-primary-100/70 py-20 bg-gradient-to-b from-white via-secondary-50/40 to-primary-50/40" aria-labelledby="events-heading">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
+          <div><p class="text-sm font-semibold uppercase tracking-wider text-primary-600">Ministry experiences</p><h2 id="events-heading" class="mt-3 text-3xl sm:text-4xl font-display font-bold text-neutral-900">Upcoming programmes</h2></div>
+          <a href="/events" class="font-semibold text-primary-700 underline underline-offset-4">Explore all events</a>
+        </div>
+        {upcomingEvents.length > 0 ? (
+          <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+            {upcomingEvents.map((event, index) => (
+              <article data-upcoming-card class="upcoming-card flex flex-col rounded-2xl border border-primary-100 bg-gradient-to-br from-white to-primary-50/60 p-7 shadow-[0_16px_45px_-28px_rgba(30,64,175,0.45)] hover:shadow-[0_22px_55px_-28px_rgba(30,64,175,0.58)]" style={`--programme-delay: ${index * 90}ms`}>
+                <div class="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wider"><span class="rounded-full bg-primary-100 px-3 py-1 text-primary-800">{formatLabel(event.location)}</span><span class="rounded-full bg-secondary-100 px-3 py-1 text-secondary-800">{formatLabel(event.format)}</span></div>
+                <h3 class="mt-5 text-xl font-semibold text-neutral-900">{event.title}</h3>
+                <p class="mt-3 font-medium text-neutral-800">{formatDate(event.date)} · {event.startTime}</p>
+                <p class="mt-3 flex-1 text-neutral-600">{event.description}</p>
+                <p class="mt-5 text-sm font-medium text-neutral-700">Registration: {formatLabel(event.registrationStatus)}</p>
+                <button data-event-id={event.id} data-event-format={event.format} type="button" disabled={event.registrationStatus === 'CLOSED'} class="mt-5 rounded-lg bg-primary-600 px-5 py-3 font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50">Plan to Attend</button>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div data-upcoming-card class="upcoming-card mt-12 rounded-2xl border border-primary-100 bg-gradient-to-br from-white via-primary-50/30 to-secondary-50/50 p-8 sm:p-10 text-center shadow-[0_18px_50px_-28px_rgba(30,64,175,0.48)] hover:shadow-[0_24px_60px_-28px_rgba(30,64,175,0.58)]">
+            <h3 class="text-2xl font-semibold text-neutral-900">New programme details are being prepared</h3>
+            <p class="mt-3 max-w-2xl mx-auto text-neutral-600">There are no approved upcoming programmes published at present. You can still register your interest, connect online, or explore the teaching archive.</p>
+            <div class="mt-6 flex flex-col sm:flex-row justify-center gap-4"><button data-select-type="IN_PERSON_EVENT" type="button" class="rounded-lg bg-primary-600 px-6 py-3 font-semibold text-white hover:bg-primary-700">Register your interest</button><a href="/sermons" class="rounded-lg border border-primary-200 bg-white px-6 py-3 font-semibold text-primary-700 hover:bg-primary-50">Explore teachings</a></div>
+          </div>
+        )}
+        <p class="mt-8 text-center text-sm text-neutral-600">Programme dates, venues and access details are published only after ministry approval. Please confirm all details before travelling.</p>
+      </div>
+    </section>
+
+    <section class="border-t border-primary-100/70 py-20 bg-white" aria-labelledby="locations-heading">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto"><p class="text-sm font-semibold uppercase tracking-wider text-primary-600">Local or international</p><h2 id="locations-heading" class="mt-3 text-3xl sm:text-4xl font-display font-bold text-neutral-900">Choose a connection point</h2><p class="mt-4 text-lg text-neutral-600">Meet with the ministry through a confirmed local office appointment or connect through an approved online programme.</p></div>
+        <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <article class="flex flex-col rounded-2xl border border-neutral-200 bg-neutral-50 p-8 sm:p-10 shadow-sm transition-shadow duration-300 hover:shadow-xl motion-reduce:transition-none">
+            <p class="text-sm font-semibold uppercase tracking-wider text-primary-600">Ghana</p>
+            <h3 class="mt-3 text-2xl font-semibold text-neutral-900">Local Offices</h3>
+            <p class="mt-4 leading-relaxed text-neutral-600">Request a confirmed appointment for ministry, partnership, administrative, or pastoral enquiries.</p>
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {localOffices.map((office) => (
+                <div class="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-300 hover:shadow-md motion-reduce:transition-none">
+                  <h4 class="font-semibold text-neutral-900">{office.name}</h4>
+                  <p class="mt-1 text-sm text-neutral-600">{office.generalArea}</p>
+                </div>
+              ))}
+            </div>
+            <p class="mt-6 text-sm leading-relaxed text-neutral-600">Exact address, appointment time, and practical access details are provided after confirmation. Please do not travel before receiving that confirmation.</p>
+            <button data-select-type="OFFICE_APPOINTMENT" type="button" class="mt-8 rounded-lg bg-primary-600 px-5 py-3 font-semibold text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">Request a Local Office Appointment</button>
+          </article>
+
+          <article class="flex flex-col rounded-2xl border border-primary-200 bg-primary-50 p-8 sm:p-10 shadow-sm transition-shadow duration-300 hover:shadow-xl motion-reduce:transition-none">
+            <p class="text-sm font-semibold uppercase tracking-wider text-primary-600">International</p>
+            <h3 class="mt-3 text-2xl font-semibold text-neutral-900">{onlineLocation.name}</h3>
+            <p class="mt-4 leading-relaxed text-neutral-600">{onlineLocation.description}</p>
+            <dl class="mt-6 space-y-4 text-sm">
+              <div><dt class="font-semibold text-neutral-900">How to join</dt><dd class="mt-1 text-neutral-600">{onlineLocation.registrationInstructions}</dd></div>
+              <div><dt class="font-semibold text-neutral-900">Accessibility</dt><dd class="mt-1 text-neutral-600">{onlineLocation.accessibilityNote}</dd></div>
+              {onlineLocation.timeZoneNote && <div><dt class="font-semibold text-neutral-900">Time zone</dt><dd class="mt-1 text-neutral-600">{onlineLocation.timeZoneNote}</dd></div>}
+            </dl>
+            <button data-select-location="ONLINE" data-type="ONLINE_EVENT" type="button" class="mt-8 rounded-lg bg-primary-600 px-5 py-3 font-semibold text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">Join an Online Programme</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="relative overflow-hidden py-20 bg-primary-900 bg-gradient-to-br from-primary-900 via-primary-800 to-neutral-900 text-white" aria-labelledby="expect-heading">
+      <div class="absolute inset-0 opacity-15" aria-hidden="true"><div class="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-primary-400 blur-3xl"></div><div class="absolute -bottom-40 left-1/4 h-80 w-80 rounded-full bg-secondary-500 blur-3xl"></div></div>
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative max-w-3xl"><p class="text-sm font-semibold uppercase tracking-wider text-secondary-300">Arrive with confidence</p><h2 id="expect-heading" class="mt-3 text-3xl sm:text-4xl font-display font-bold text-white">What to expect</h2><p class="mt-4 text-lg leading-relaxed text-primary-100">Programme duration varies; confirmed details will state the expected start and finish time. Arrive 15 minutes early and dress comfortably. Office visits require confirmation before travel.</p></div>
+        <div class="relative mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {expectations.map(([title, copy, iconPath]) => (
+            <article class="rounded-xl border border-white/20 bg-white/10 p-7 shadow-[0_18px_45px_-28px_rgba(0,0,0,0.8)] backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/[0.15] hover:shadow-[0_24px_55px_-28px_rgba(0,0,0,0.9)] motion-reduce:transition-none">
+              <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-secondary-400/15 text-secondary-300 ring-1 ring-secondary-300/20" aria-hidden="true">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d={iconPath}></path></svg>
+              </div>
+              <h3 class="mt-5 text-xl font-semibold text-white">{title}</h3>
+              <p class="mt-3 leading-relaxed text-primary-100">{copy}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <PlanVisitForm events={upcomingEvents} />
+
+    <section class="border-t border-primary-100 py-20 bg-primary-50" aria-labelledby="trust-heading">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl">
+          <p class="text-sm font-semibold uppercase tracking-wider text-primary-600">Your wellbeing matters</p>
+          <div class="mt-3 flex items-center gap-4">
+            <div class="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-primary-100 text-primary-700" aria-hidden="true"><svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9c0-1.042-.133-2.052-.382-3.016z"></path></svg></div>
+            <h2 id="trust-heading" class="text-3xl sm:text-4xl font-display font-bold text-neutral-900">Trust, privacy and safeguarding</h2>
+          </div>
+        </div>
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 text-neutral-700">
+          <article class="rounded-xl border border-primary-100 bg-white p-6">
+            <h3 class="font-semibold text-neutral-900">Responsible handling</h3>
+            <p class="mt-3 leading-relaxed">Your information is intended to be accessed only by authorised ministry workers. Office visits must be confirmed before arrival.</p>
+          </article>
+          <article class="rounded-xl border border-primary-100 bg-white p-6">
+            <h3 class="font-semibold text-neutral-900">Safety and safeguarding</h3>
+            <p class="mt-3 leading-relaxed">Children and young people remain subject to ministry safeguarding procedures. For immediate danger, violence or criminal emergencies, contact the appropriate emergency or public authority rather than waiting for a website response.</p>
+          </article>
+        </div>
+        <p class="mt-6 text-sm text-neutral-600"><strong>Privacy policy TODO:</strong> the current footer links to `/privacy`, but that policy page has not yet been implemented or legally approved.</p>
+      </div>
+    </section>
+
+    <section class="border-t border-neutral-100 py-20 bg-white" aria-labelledby="faq-heading">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center"><p class="text-sm font-semibold uppercase tracking-wider text-primary-600">Before you connect</p><h2 id="faq-heading" class="mt-3 text-3xl sm:text-4xl font-display font-bold text-neutral-900">Frequently asked questions</h2></div>
+        <div class="mt-12 divide-y divide-neutral-200 border-y border-neutral-200">
+          {faqs.map(([question, answer]) => <details class="group py-6"><summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500"><span>{question}</span><span aria-hidden="true" class="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-primary-50 text-lg text-primary-700 ring-1 ring-primary-100 transition-transform duration-200 group-open:rotate-45 motion-reduce:transition-none motion-reduce:transform-none">+</span></summary><p class="mt-4 pr-12 leading-relaxed text-neutral-600">{answer}</p></details>)}
+        </div>
+      </div>
+    </section>
+
+    <section class="py-20 bg-gradient-to-r from-primary-700 to-primary-800 text-white" aria-labelledby="final-heading">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 id="final-heading" class="text-3xl sm:text-4xl font-display font-bold">Take Your Next Step</h2>
+        <p class="mt-5 text-lg text-primary-50">Whether you are joining us in Accra, Kumasi or online, our team is ready to help you connect with an appropriate Omet Omeni Ministries programme.</p>
+        <a href="#plan-form" class="mt-8 inline-flex rounded-lg bg-white px-7 py-4 font-semibold text-primary-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-800">Plan Your Visit</a>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  const connectionCards = document.querySelectorAll<HTMLElement>('[data-connect-card]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (connectionCards.length && !reduceMotion) {
+    document.documentElement.classList.add('has-connect-reveal');
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+
+      connectionCards.forEach((card) => observer.observe(card));
+    } else {
+      connectionCards.forEach((card) => card.classList.add('is-visible'));
+    }
+  }
+
+  const upcomingCards = document.querySelectorAll<HTMLElement>('[data-upcoming-card]');
+  if (upcomingCards.length && !reduceMotion) {
+    document.documentElement.classList.add('has-upcoming-reveal');
+
+    if ('IntersectionObserver' in window) {
+      const upcomingObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            upcomingObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+
+      upcomingCards.forEach((card) => upcomingObserver.observe(card));
+    } else {
+      upcomingCards.forEach((card) => card.classList.add('is-visible'));
+    }
+  }
+</script>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.has-connect-reveal) .connect-card {
+      opacity: 0;
+      transform: translateY(24px) scale(0.985);
+    }
+
+    :global(.has-connect-reveal) .connect-card.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition:
+        opacity 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 300ms ease;
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+
+    :global(.has-upcoming-reveal) .upcoming-card {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    :global(.has-upcoming-reveal) .upcoming-card.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition:
+        opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 300ms ease;
+      transition-delay: var(--programme-delay, 0ms);
+    }
+
+  }
+</style>
