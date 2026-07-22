@@ -1,0 +1,369 @@
+---
+import type { MinistryEvent } from '../data/events';
+
+interface Props {
+  events: MinistryEvent[];
+}
+
+const { events } = Astro.props;
+const endpoint = import.meta.env.PUBLIC_VISIT_REQUEST_ENDPOINT ?? '';
+---
+
+<section id="plan-form" class="border-t border-neutral-100 py-20 bg-white scroll-mt-24" aria-labelledby="form-heading">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <p class="text-sm font-semibold uppercase tracking-wider text-primary-600">Your next step</p>
+      <h2 id="form-heading" class="mt-3 text-3xl sm:text-4xl font-display font-bold text-neutral-900">Plan how you would like to connect</h2>
+      <p class="mt-4 text-lg text-neutral-600">Complete the five short steps below. Required fields are marked with an asterisk.</p>
+    </div>
+
+    <div class="mb-8" aria-label="Form progress">
+      <div class="flex items-center justify-between text-sm font-medium text-neutral-600">
+        <span id="progress-label">Step 1 of 5</span><span id="progress-name">Connection</span>
+      </div>
+      <div class="mt-3 h-2 overflow-hidden rounded-full bg-neutral-200">
+        <div id="progress-bar" class="h-full w-1/5 rounded-full bg-primary-600 transition-[width] duration-200 motion-reduce:transition-none"></div>
+      </div>
+    </div>
+
+    <div id="form-error-summary" class="hidden mb-6 rounded-lg border border-red-300 bg-red-50 p-4 text-red-800" role="alert" tabindex="-1">
+      <h3 class="font-semibold">Please review the highlighted fields.</h3>
+      <ul class="mt-2 list-disc pl-5 text-sm" id="form-error-list"></ul>
+    </div>
+
+    <form id="visit-request-form" data-endpoint={endpoint} novalidate class="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 sm:p-10 shadow-sm">
+      <div class="absolute -left-[10000px]" aria-hidden="true">
+        <label for="company">Leave this field empty</label>
+        <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="-mx-6 -mt-6 mb-8 flex items-start gap-4 rounded-t-2xl border-b border-primary-100 bg-primary-50 px-6 py-5 sm:-mx-10 sm:-mt-10 sm:px-10">
+        <div class="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-white text-primary-700 shadow-sm" aria-hidden="true"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 11c0-1.657-1.343-3-3-3S6 9.343 6 11v2m3-8a3 3 0 100-6 3 3 0 000 6zm6 6V8a3 3 0 10-6 0v3m3 0v9m-4 0h8"></path></svg></div>
+        <div><h3 class="font-semibold text-neutral-900">A guided, private request</h3><p class="mt-1 text-sm leading-relaxed text-neutral-600">Only provide the information needed for the ministry to respond appropriately.</p></div>
+      </div>
+
+      <fieldset data-step="1">
+        <legend id="step-heading-1" tabindex="-1" class="text-2xl font-display font-bold text-neutral-900">1. How would you like to connect?</legend>
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[
+            ['IN_PERSON_EVENT', 'Attend in person'],
+            ['ONLINE_EVENT', 'Join online'],
+            ['OFFICE_APPOINTMENT', 'Request an office appointment'],
+            ['PRAYER_REQUEST', 'Request prayer'],
+            ['PARTNERSHIP_ENQUIRY', 'Partnership enquiry'],
+            ['MEDIA_ENQUIRY', 'Media enquiry'],
+          ].map(([value, label]) => (
+            <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200 bg-white p-4 hover:border-primary-300 has-[:checked]:border-primary-600 has-[:checked]:ring-2 has-[:checked]:ring-primary-100">
+              <input class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500" type="radio" name="visitType" value={value} required />
+              <span class="font-medium text-neutral-900">{label}</span>
+            </label>
+          ))}
+        </div>
+        <p class="mt-2 text-sm text-red-700" data-error-for="visitType"></p>
+      </fieldset>
+
+      <fieldset data-step="2" hidden>
+        <legend id="step-heading-2" tabindex="-1" class="text-2xl font-display font-bold text-neutral-900">2. Where would you like to connect?</legend>
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[
+            ['ACCRA', 'Accra'], ['KUMASI', 'Kumasi'], ['ONLINE', 'Online'], ['UNSURE', 'I am unsure'],
+          ].map(([value, label]) => (
+            <label class="flex cursor-pointer gap-3 rounded-xl border border-neutral-200 bg-white p-4 hover:border-primary-300 has-[:checked]:border-primary-600 has-[:checked]:ring-2 has-[:checked]:ring-primary-100">
+              <input class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500" type="radio" name="location" value={value} required />
+              <span class="font-medium text-neutral-900">{label}</span>
+            </label>
+          ))}
+        </div>
+        <p class="mt-2 text-sm text-red-700" data-error-for="location"></p>
+      </fieldset>
+
+      <fieldset data-step="3" hidden>
+        <legend id="step-heading-3" tabindex="-1" class="text-2xl font-display font-bold text-neutral-900">3. Select a programme or purpose</legend>
+        <div class="mt-6 space-y-6">
+          <div data-for-types="IN_PERSON_EVENT,ONLINE_EVENT">
+            <label for="eventId" class="block text-sm font-medium text-neutral-800">Programme</label>
+            <select id="eventId" name="eventId" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
+              <option value="">Choose a confirmed programme when available</option>
+              {events.map((event) => <option value={event.id}>{event.title}</option>)}
+            </select>
+            {events.length === 0 && <p class="mt-2 text-sm text-neutral-600">No approved upcoming programmes are currently published. You may continue and our team can share an appropriate next step.</p>}
+          </div>
+
+          <div data-for-types="OFFICE_APPOINTMENT" hidden>
+            <label for="appointmentPurpose" class="block text-sm font-medium text-neutral-800">Appointment purpose *</label>
+            <input id="appointmentPurpose" name="appointmentPurpose" maxlength="250" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500" />
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><label for="preferredDate" class="block text-sm font-medium text-neutral-800">Preferred date *</label><input id="preferredDate" name="preferredDate" type="date" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" /></div>
+              <div><label for="preferredTime" class="block text-sm font-medium text-neutral-800">Preferred time *</label><input id="preferredTime" name="preferredTime" type="time" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" /></div>
+            </div>
+            <p class="mt-4 rounded-lg bg-secondary-50 p-4 text-sm text-secondary-900">Submitting this request does not confirm an appointment. Please wait for the ministry office to confirm before travelling.</p>
+          </div>
+
+          <div data-for-types="IN_PERSON_EVENT" hidden>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><label for="adultsAttending" class="block text-sm font-medium text-neutral-800">Number of adults</label><input id="adultsAttending" name="adultsAttending" type="number" value="1" min="0" max="20" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" /></div>
+              <div><label for="childrenAttending" class="block text-sm font-medium text-neutral-800">Number of children</label><input id="childrenAttending" name="childrenAttending" type="number" value="0" min="0" max="20" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" /></div>
+            </div>
+            <div id="children-details" hidden class="mt-4 space-y-4 rounded-lg border border-neutral-200 bg-white p-4">
+              <div><label for="childAgeRanges" class="block text-sm font-medium text-neutral-800">Children's age ranges *</label><input id="childAgeRanges" name="childAgeRanges" placeholder="For example: 3–5, 8–11" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+              <label class="flex gap-3 text-sm text-neutral-700"><input name="guardianAcknowledged" type="checkbox" class="mt-1 h-4 w-4 text-primary-600" /><span>I am a parent or guardian, or I have their permission. I understand event-specific child registration may still be required.</span></label>
+            </div>
+          </div>
+
+          <div data-for-types="PRAYER_REQUEST" hidden>
+            <label for="prayerRequest" class="block text-sm font-medium text-neutral-800">Prayer request *</label>
+            <textarea id="prayerRequest" name="prayerRequest" rows="4" maxlength="1500" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3"></textarea>
+            <label for="safeContactTime" class="mt-4 block text-sm font-medium text-neutral-800">Safe time to contact</label>
+            <input id="safeContactTime" name="safeContactTime" maxlength="120" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" />
+            <p class="mt-4 rounded-lg bg-secondary-50 p-4 text-sm text-secondary-900">Requests are handled carefully, but information may need to be shared with appropriate persons where there is a serious safety or safeguarding concern.</p>
+          </div>
+
+          <div data-for-types="PARTNERSHIP_ENQUIRY,MEDIA_ENQUIRY" hidden>
+            <label for="message" class="block text-sm font-medium text-neutral-800">Brief message</label>
+            <textarea id="message" name="message" rows="4" maxlength="1500" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3"></textarea>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset data-step="4" hidden>
+        <legend id="step-heading-4" tabindex="-1" class="text-2xl font-display font-bold text-neutral-900">4. Tell us about yourself</legend>
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div><label for="firstName" class="block text-sm font-medium text-neutral-800">First name *</label><input id="firstName" name="firstName" autocomplete="given-name" maxlength="80" required class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" /><p class="mt-1 text-sm text-red-700" data-error-for="firstName"></p></div>
+          <div><label for="lastName" class="block text-sm font-medium text-neutral-800">Last name *</label><input id="lastName" name="lastName" autocomplete="family-name" maxlength="80" required class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" /><p class="mt-1 text-sm text-red-700" data-error-for="lastName"></p></div>
+          <div><label for="phone" class="block text-sm font-medium text-neutral-800">Mobile number *</label><input id="phone" name="phone" type="tel" autocomplete="tel" required pattern="\+?[0-9][0-9\s()\-]{6,19}" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" /><p class="mt-1 text-sm text-red-700" data-error-for="phone"></p></div>
+          <div><label for="whatsapp" class="block text-sm font-medium text-neutral-800">WhatsApp, if different</label><input id="whatsapp" name="whatsapp" type="tel" autocomplete="tel" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" /></div>
+          <div><label for="email" class="block text-sm font-medium text-neutral-800">Email</label><input id="email" name="email" type="email" autocomplete="email" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" /><p class="mt-1 text-sm text-red-700" data-error-for="email"></p></div>
+          <div><label for="preferredContactMethod" class="block text-sm font-medium text-neutral-800">Preferred contact method *</label><select id="preferredContactMethod" name="preferredContactMethod" required class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3"><option value="">Choose one</option><option value="WHATSAPP">WhatsApp</option><option value="PHONE">Phone</option><option value="EMAIL">Email</option></select></div>
+          <div><label for="residentialArea" class="block text-sm font-medium text-neutral-800">Residential area</label><input id="residentialArea" name="residentialArea" maxlength="120" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" /></div>
+          <div><label for="heardAboutUs" class="block text-sm font-medium text-neutral-800">How did you hear about us?</label><input id="heardAboutUs" name="heardAboutUs" maxlength="120" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3" /></div>
+          <div class="sm:col-span-2"><label for="accessibilityNeeds" class="block text-sm font-medium text-neutral-800">Accessibility or practical needs</label><textarea id="accessibilityNeeds" name="accessibilityNeeds" rows="3" maxlength="1500" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3"></textarea></div>
+          <label class="sm:col-span-2 flex gap-3 text-sm text-neutral-700"><input name="isFirstTime" type="checkbox" class="mt-1 h-4 w-4 text-primary-600" /><span>This is my first connection with Omet Omeni Ministries.</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset data-step="5" hidden>
+        <legend id="step-heading-5" tabindex="-1" class="text-2xl font-display font-bold text-neutral-900">5. Review and submit</legend>
+        <div id="review-content" class="mt-6 rounded-xl border border-neutral-200 bg-white p-5 text-sm text-neutral-700"></div>
+        <div class="mt-6 space-y-4">
+          <label class="flex gap-3 text-sm text-neutral-700"><input name="contactConsent" type="checkbox" required class="mt-1 h-4 w-4 text-primary-600" /><span>I consent to being contacted about this request. *</span></label>
+          <label class="flex gap-3 text-sm text-neutral-700"><input name="privacyAccepted" type="checkbox" required class="mt-1 h-4 w-4 text-primary-600" /><span>I understand the privacy and safeguarding notice below. *</span></label>
+          <label class="flex gap-3 text-sm text-neutral-700"><input name="programmeConsent" type="checkbox" class="mt-1 h-4 w-4 text-primary-600" /><span>Send me information about the programme selected in this request.</span></label>
+          <label class="flex gap-3 text-sm text-neutral-700"><input name="marketingConsent" type="checkbox" class="mt-1 h-4 w-4 text-primary-600" /><span>I would like to receive future ministry updates. This is optional.</span></label>
+        </div>
+      </fieldset>
+
+      <div class="mt-8 flex flex-col-reverse sm:flex-row sm:justify-between gap-3 border-t border-neutral-200 pt-6">
+        <button id="previous-step" type="button" hidden class="rounded-lg border border-neutral-300 bg-white px-6 py-3 font-semibold text-neutral-700 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500">Previous</button>
+        <button id="continue-step" type="button" class="sm:ml-auto rounded-lg bg-primary-600 px-6 py-3 font-semibold text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">Continue</button>
+        <button id="submit-request" type="submit" hidden class="sm:ml-auto rounded-lg bg-primary-600 px-6 py-3 font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">Submit request</button>
+      </div>
+
+      <p id="submission-status" class="mt-5 text-sm" aria-live="polite"></p>
+    </form>
+
+    <section id="submission-success" hidden tabindex="-1" class="rounded-2xl border border-green-200 bg-green-50 p-8 sm:p-10">
+      <h2 class="text-3xl font-display font-bold text-neutral-900">Thank You. Your Request Has Been Received.</h2>
+      <p id="success-message" class="mt-4 text-lg text-neutral-700"></p>
+      <dl class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        <div><dt class="font-semibold text-neutral-900">Reference</dt><dd id="success-reference" class="mt-1 text-neutral-700"></dd></div>
+        <div><dt class="font-semibold text-neutral-900">Connection type</dt><dd id="success-type" class="mt-1 text-neutral-700"></dd></div>
+        <div><dt class="font-semibold text-neutral-900">Location</dt><dd id="success-location" class="mt-1 text-neutral-700"></dd></div>
+        <div><dt class="font-semibold text-neutral-900">Expected response</dt><dd class="mt-1 text-neutral-700">The ministry will respond through your selected contact method.</dd></div>
+      </dl>
+      <div class="mt-8 flex flex-wrap gap-4"><a href="/events" class="font-semibold text-primary-700 underline">View Events</a><a href="/sermons" class="font-semibold text-primary-700 underline">Explore Sermons</a><a href="/contact" class="font-semibold text-primary-700 underline">Contact the Ministry</a></div>
+    </section>
+  </div>
+</section>
+
+<script>
+  import { validateVisitRequest, type PlanVisitSubmission, type VisitType } from '../lib/visit-request';
+
+  const form = document.querySelector<HTMLFormElement>('#visit-request-form')!;
+  if (form) {
+    const steps = Array.from(form.querySelectorAll<HTMLElement>('[data-step]'));
+    const previous = form.querySelector<HTMLButtonElement>('#previous-step')!;
+    const next = form.querySelector<HTMLButtonElement>('#continue-step')!;
+    const submit = form.querySelector<HTMLButtonElement>('#submit-request')!;
+    const progressLabel = document.querySelector<HTMLElement>('#progress-label')!;
+    const progressName = document.querySelector<HTMLElement>('#progress-name')!;
+    const progressBar = document.querySelector<HTMLElement>('#progress-bar')!;
+    const errorSummary = document.querySelector<HTMLElement>('#form-error-summary')!;
+    const errorList = document.querySelector<HTMLUListElement>('#form-error-list')!;
+    const stepNames = ['Connection', 'Location', 'Programme or purpose', 'Your details', 'Review'];
+    let currentStep = 1;
+
+    const selectedType = () => form.querySelector<HTMLInputElement>('input[name="visitType"]:checked')?.value as VisitType | undefined;
+    const fieldValue = (name: string) => (form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null)?.value.trim() ?? '';
+    const checked = (name: string) => Boolean((form.elements.namedItem(name) as HTMLInputElement | null)?.checked);
+
+    function showStep(step: number) {
+      currentStep = step;
+      steps.forEach((element) => { element.hidden = Number(element.dataset.step) !== step; });
+      previous.hidden = step === 1;
+      next.hidden = step === 5;
+      submit.hidden = step !== 5;
+      progressLabel.textContent = `Step ${step} of 5`;
+      progressName.textContent = stepNames[step - 1];
+      progressBar.style.width = `${step * 20}%`;
+      errorSummary.classList.add('hidden');
+      if (step === 5) renderReview();
+      document.querySelector<HTMLElement>(`#step-heading-${step}`)?.focus();
+    }
+
+    function updateConditions() {
+      const type = selectedType();
+      form.querySelectorAll<HTMLElement>('[data-for-types]').forEach((group) => {
+        const visible = Boolean(type && group.dataset.forTypes?.split(',').includes(type));
+        group.hidden = !visible;
+        group.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input, select, textarea').forEach((control) => {
+          control.disabled = !visible;
+        });
+      });
+
+      const online = form.querySelector<HTMLInputElement>('input[name="location"][value="ONLINE"]');
+      if (type === 'ONLINE_EVENT' && online) {
+        online.checked = true;
+        form.querySelectorAll<HTMLInputElement>('input[name="location"]').forEach((option) => { option.disabled = option.value !== 'ONLINE'; });
+      } else {
+        form.querySelectorAll<HTMLInputElement>('input[name="location"]').forEach((option) => { option.disabled = false; });
+      }
+
+      const appointment = type === 'OFFICE_APPOINTMENT';
+      ['appointmentPurpose', 'preferredDate', 'preferredTime'].forEach((name) => {
+        const control = form.elements.namedItem(name) as HTMLInputElement | null;
+        if (control) control.required = appointment;
+      });
+      const prayer = form.elements.namedItem('prayerRequest') as HTMLTextAreaElement | null;
+      if (prayer) prayer.required = type === 'PRAYER_REQUEST';
+
+      const children = Number(fieldValue('childrenAttending') || 0);
+      const childrenDetails = document.querySelector<HTMLElement>('#children-details');
+      if (childrenDetails) {
+        childrenDetails.hidden = children <= 0;
+        childrenDetails.querySelectorAll<HTMLInputElement>('input').forEach((control) => {
+          control.disabled = children <= 0;
+          control.required = children > 0;
+        });
+      }
+    }
+
+    function validateCurrentStep() {
+      updateConditions();
+      const current = steps[currentStep - 1];
+      const controls = Array.from(current.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input, select, textarea')).filter((control) => !control.disabled);
+      const invalid = controls.find((control) => !control.checkValidity());
+      if (invalid) {
+        invalid.reportValidity();
+        invalid.focus();
+        return false;
+      }
+      return true;
+    }
+
+    function buildPayload(): PlanVisitSubmission {
+      return {
+        visitType: fieldValue('visitType') as PlanVisitSubmission['visitType'],
+        location: fieldValue('location') as PlanVisitSubmission['location'],
+        eventId: fieldValue('eventId') || undefined,
+        appointmentPurpose: fieldValue('appointmentPurpose') || undefined,
+        firstName: fieldValue('firstName'), lastName: fieldValue('lastName'), phone: fieldValue('phone'),
+        whatsapp: fieldValue('whatsapp') || undefined, email: fieldValue('email') || undefined,
+        preferredContactMethod: fieldValue('preferredContactMethod') as PlanVisitSubmission['preferredContactMethod'],
+        adultsAttending: Number(fieldValue('adultsAttending') || 0), childrenAttending: Number(fieldValue('childrenAttending') || 0),
+        childAgeRanges: fieldValue('childAgeRanges') ? fieldValue('childAgeRanges').split(',').map((item) => item.trim()).filter(Boolean) : undefined,
+        guardianAcknowledged: checked('guardianAcknowledged'), isFirstTime: checked('isFirstTime'),
+        heardAboutUs: fieldValue('heardAboutUs') || undefined, residentialArea: fieldValue('residentialArea') || undefined,
+        accessibilityNeeds: fieldValue('accessibilityNeeds') || undefined, message: fieldValue('message') || undefined,
+        prayerRequest: fieldValue('prayerRequest') || undefined, safeContactTime: fieldValue('safeContactTime') || undefined,
+        preferredDate: fieldValue('preferredDate') || undefined, preferredTime: fieldValue('preferredTime') || undefined,
+        contactConsent: checked('contactConsent'), programmeConsent: checked('programmeConsent'),
+        marketingConsent: checked('marketingConsent'), privacyAccepted: checked('privacyAccepted'),
+        consentTimestamp: new Date().toISOString(), source: 'WEBSITE_PLAN_YOUR_VISIT',
+      };
+    }
+
+    function renderReview() {
+      const review = document.querySelector<HTMLElement>('#review-content')!;
+      const items = [
+        ['Connection', fieldValue('visitType').replaceAll('_', ' ')], ['Location', fieldValue('location')],
+        ['Programme', form.querySelector<HTMLOptionElement>('#eventId option:checked')?.textContent ?? 'Not selected'],
+        ['Name', `${fieldValue('firstName')} ${fieldValue('lastName')}`.trim()], ['Contact by', fieldValue('preferredContactMethod')],
+      ];
+      review.replaceChildren(...items.map(([label, value]) => {
+        const row = document.createElement('p'); row.className = 'py-2 border-b border-neutral-100 last:border-0';
+        const strong = document.createElement('strong'); strong.textContent = `${label}: `; row.append(strong, document.createTextNode(value || 'Not provided')); return row;
+      }));
+    }
+
+    function showErrors(errors: Record<string, string>) {
+      form.querySelectorAll<HTMLElement>('[data-error-for]').forEach((item) => { item.textContent = ''; });
+      errorList.replaceChildren();
+      Object.entries(errors).forEach(([field, message]) => {
+        const inline = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`); if (inline) inline.textContent = message;
+        const li = document.createElement('li'); li.textContent = message; errorList.append(li);
+      });
+      errorSummary.classList.remove('hidden'); errorSummary.focus();
+    }
+
+    form.addEventListener('change', updateConditions);
+    form.querySelector('#childrenAttending')?.addEventListener('input', updateConditions);
+    document.querySelectorAll<HTMLButtonElement>('[data-select-type]').forEach((button) => button.addEventListener('click', () => {
+      const option = form.querySelector<HTMLInputElement>(`input[name="visitType"][value="${button.dataset.selectType}"]`);
+      if (option) { option.checked = true; updateConditions(); showStep(2); document.querySelector('#plan-form')?.scrollIntoView({ behavior: 'smooth' }); }
+    }));
+    document.querySelectorAll<HTMLButtonElement>('[data-select-location]').forEach((button) => button.addEventListener('click', () => {
+      const type = button.dataset.type; const location = button.dataset.selectLocation;
+      const typeOption = form.querySelector<HTMLInputElement>(`input[name="visitType"][value="${type}"]`);
+      const locationOption = form.querySelector<HTMLInputElement>(`input[name="location"][value="${location}"]`);
+      if (typeOption) typeOption.checked = true; if (locationOption) locationOption.checked = true; updateConditions(); showStep(3); document.querySelector('#plan-form')?.scrollIntoView({ behavior: 'smooth' });
+    }));
+    document.querySelectorAll<HTMLButtonElement>('[data-event-id]').forEach((button) => button.addEventListener('click', () => {
+      const type = button.dataset.eventFormat === 'ONLINE' ? 'ONLINE_EVENT' : 'IN_PERSON_EVENT';
+      const typeOption = form.querySelector<HTMLInputElement>(`input[name="visitType"][value="${type}"]`); if (typeOption) typeOption.checked = true;
+      const eventSelect = form.querySelector<HTMLSelectElement>('#eventId'); if (eventSelect) eventSelect.value = button.dataset.eventId ?? '';
+      updateConditions(); showStep(2); document.querySelector('#plan-form')?.scrollIntoView({ behavior: 'smooth' });
+    }));
+    next.addEventListener('click', () => { if (validateCurrentStep()) showStep(currentStep + 1); });
+    previous.addEventListener('click', () => showStep(currentStep - 1));
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (fieldValue('company')) return;
+      const payload = buildPayload();
+      const validation = validateVisitRequest(payload);
+      if (!validation.valid) { showErrors(validation.errors); return; }
+      const endpoint = form.dataset.endpoint;
+      const status = document.querySelector<HTMLElement>('#submission-status')!;
+      if (!endpoint) {
+        status.className = 'mt-5 text-sm text-red-700';
+        status.textContent = 'Online requests are not yet connected to a delivery service. Please email hello@ometomeni.org instead.';
+        return;
+      }
+      submit.disabled = true; status.className = 'mt-5 text-sm text-neutral-700'; status.textContent = 'Submitting your request…';
+      try {
+        const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || typeof result.reference !== 'string') throw new Error('Submission was not accepted.');
+        const messages: Record<VisitType, string> = {
+          IN_PERSON_EVENT: 'We have received your plan-to-attend request. Confirmation details will be sent through your selected contact method.',
+          OFFICE_APPOINTMENT: 'Your appointment request has been received. Please do not travel to the office until the date, time and location have been confirmed.',
+          ONLINE_EVENT: 'Your registration has been received. Access instructions will be sent before the programme.',
+          PRAYER_REQUEST: 'Your request has been received and will be reviewed by an authorised ministry worker.',
+          PARTNERSHIP_ENQUIRY: 'Your partnership enquiry has been received for review.', MEDIA_ENQUIRY: 'Your media enquiry has been received for review.',
+        };
+        document.querySelector<HTMLElement>('#success-message')!.textContent = messages[payload.visitType];
+        document.querySelector<HTMLElement>('#success-reference')!.textContent = result.reference;
+        document.querySelector<HTMLElement>('#success-type')!.textContent = payload.visitType.replaceAll('_', ' ');
+        document.querySelector<HTMLElement>('#success-location')!.textContent = payload.location;
+        form.closest<HTMLElement>('#plan-form')?.querySelectorAll<HTMLElement>(':scope > div > :not(#submission-success)').forEach((element) => { element.hidden = true; });
+        const success = document.querySelector<HTMLElement>('#submission-success')!; success.hidden = false; success.focus();
+      } catch {
+        status.className = 'mt-5 text-sm text-red-700';
+        status.textContent = 'We could not submit your request. Your entries are still available; please try again or email hello@ometomeni.org.';
+        submit.disabled = false;
+      }
+    });
+
+    updateConditions();
+  }
+</script>

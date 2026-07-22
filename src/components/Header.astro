@@ -31,7 +31,7 @@ const navigation = [
       </div>
 
       <!-- Desktop Navigation -->
-      <div class="hidden md:flex items-center space-x-8">
+      <div class="hidden md:flex items-center gap-5">
         {navigation.map((item) => (
           <a 
             href={item.href}
@@ -49,6 +49,17 @@ const navigation = [
             }`}></span>
           </a>
         ))}
+        <a
+          href="/plan-your-visit"
+          class={`inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+            currentPath === '/plan-your-visit'
+              ? 'bg-primary-700 text-white'
+              : 'bg-primary-600 text-white hover:bg-primary-700'
+          }`}
+          aria-current={currentPath === '/plan-your-visit' ? 'page' : undefined}
+        >
+          Plan Your Visit
+        </a>
       </div>
 
       <!-- Mobile menu button -->
@@ -87,6 +98,17 @@ const navigation = [
         </div>
         
         <nav class="space-y-1">
+          <a
+            href="/plan-your-visit"
+            class={`block px-3 py-3 mb-4 text-base font-semibold rounded-lg transition-colors ${
+              currentPath === '/plan-your-visit'
+                ? 'bg-primary-700 text-white'
+                : 'bg-primary-600 text-white hover:bg-primary-700'
+            }`}
+            aria-current={currentPath === '/plan-your-visit' ? 'page' : undefined}
+          >
+            Plan Your Visit
+          </a>
           {navigation.map((item) => (
             <a
               href={item.href}
