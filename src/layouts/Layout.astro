@@ -1,0 +1,116 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const { 
+  title, 
+  description = "Omet Omeni Ministries - Preaching and Teaching Jesus Christ. Join us for worship, fellowship, and spiritual growth.",
+  image = "/og-image.jpg"
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- SEO Meta Tags -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Church",
+        "name": "Omet Omeni Ministries",
+        "description": "Preaching and Teaching Jesus Christ",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Conference Hall, Royal Cockpit Hotel, Ahodwo-Nhyiaeso",
+          "addressLocality": "Kumasi",
+          "addressCountry": "Ghana"
+        },
+        "email": "hello@ometomeni.org",
+        "url": "https://ometomeni.org",
+        "sameAs": [
+          "https://www.facebook.com/oominternational",
+          "https://www.instagram.com/oominternational",
+          "https://www.youtube.com/@oominternaional"
+        ]
+      }
+    </script>
+  </head>
+  <body class="font-sans text-neutral-800 bg-white">
+    <slot />
+    
+    <!-- Scroll to Top Button -->
+    <button id="scroll-to-top" class="fixed bottom-6 right-6 bg-primary-600 text-white p-3 rounded-full shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-primary-700 z-50">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+      </svg>
+    </button>
+
+    <script>
+      // Scroll to top functionality
+      const scrollButton = document.getElementById('scroll-to-top');
+      
+      window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+          scrollButton?.classList.remove('opacity-0', 'invisible');
+          scrollButton?.classList.add('opacity-100', 'visible');
+        } else {
+          scrollButton?.classList.add('opacity-0', 'invisible');
+          scrollButton?.classList.remove('opacity-100', 'visible');
+        }
+      });
+      
+      scrollButton?.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      // Mobile menu toggle
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      mobileMenuButton?.addEventListener('click', () => {
+        const isOpen = mobileMenu?.classList.contains('translate-x-0');
+        if (isOpen) {
+          mobileMenu?.classList.remove('translate-x-0');
+          mobileMenu?.classList.add('-translate-x-full');
+        } else {
+          mobileMenu?.classList.add('translate-x-0');
+          mobileMenu?.classList.remove('-translate-x-full');
+        }
+      });
+
+      // Close mobile menu on link click
+      const mobileMenuLinks = document.querySelectorAll('#mobile-menu a');
+      mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu?.classList.remove('translate-x-0');
+          mobileMenu?.classList.add('-translate-x-full');
+        });
+      });
+    </script>
+  </body>
+</html>
