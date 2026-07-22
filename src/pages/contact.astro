@@ -113,6 +113,10 @@ import Footer from '../components/Footer.astro';
           </div>
           
           <form class="space-y-6" id="contact-form">
+            <div class="absolute -left-[10000px]" aria-hidden="true">
+              <label for="contact-company">Leave this field empty</label>
+              <input id="contact-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+            </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label for="first-name" class="block text-sm font-medium text-neutral-700 mb-2">First Name</label>
@@ -203,6 +207,13 @@ import Footer from '../components/Footer.astro';
                 I would like to receive updates about church events and activities via email.
               </label>
             </div>
+
+            <div class="flex items-start space-x-3">
+              <input id="contact-consent" name="contactConsent" type="checkbox" required class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded" />
+              <label for="contact-consent" class="text-sm text-neutral-600">
+                I consent to Omet Omeni Ministries using these details to respond to this request. *
+              </label>
+            </div>
             
             <button 
               type="submit"
@@ -215,6 +226,7 @@ import Footer from '../components/Footer.astro';
                 </svg>
               </span>
             </button>
+            <p id="contact-form-status" class="text-sm" role="status" aria-live="polite"></p>
           </form>
         </div>
       </div>
@@ -341,42 +353,34 @@ import Footer from '../components/Footer.astro';
 </Layout>
 
 <script>
-  // Contact form handling
-  document.getElementById('contact-form')?.addEventListener('submit', function(e) {
+  const contactForm = document.querySelector<HTMLFormElement>('#contact-form');
+  contactForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    // Show success message (in a real application, this would submit to a server)
-    const button = this.querySelector('button[type="submit"]');
+    if (!contactForm.checkValidity()) { contactForm.reportValidity(); return; }
+    const button = contactForm.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const status = document.querySelector<HTMLElement>('#contact-form-status')!;
     const originalText = button.innerHTML;
-    
-    button.innerHTML = `
-      <span class="flex items-center justify-center">
-        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        Sending...
-      </span>
-    `;
-    
-    // Simulate form submission
-    setTimeout(() => {
-      button.innerHTML = `
-        <span class="flex items-center justify-center">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-          Message Sent!
-        </span>
-      `;
-      
-      // Reset form
-      this.reset();
-      
-      // Reset button after 3 seconds
-      setTimeout(() => {
-        button.innerHTML = originalText;
-      }, 3000);
-    }, 2000);
+    button.disabled = true;
+    button.textContent = 'Sending…';
+    status.className = 'text-sm text-neutral-600';
+    status.textContent = 'Sending your message securely…';
+    const data = Object.fromEntries(new FormData(contactForm).entries());
+    try {
+      const response = await fetch('/api/forms', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ kind: 'contact', ...data }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || typeof result.reference !== 'string') throw new Error();
+      contactForm.reset();
+      status.className = 'text-sm font-medium text-green-700';
+      status.textContent = `Message sent. Your reference is ${result.reference}.`;
+    } catch {
+      status.className = 'text-sm font-medium text-red-700';
+      status.textContent = 'We could not send your message. Your entries are still available; please try again or email hello@ometomeni.org.';
+    } finally {
+      button.disabled = false;
+      button.innerHTML = originalText;
+    }
   });
 </script>

@@ -533,6 +533,10 @@ const volunteerOpportunities = [
         </div>
         
         <form class="space-y-6" id="ministry-form">
+          <div class="absolute -left-[10000px]" aria-hidden="true">
+            <label for="ministry-company">Leave this field empty</label>
+            <input id="ministry-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+          </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label for="full-name" class="block text-sm font-medium text-neutral-700 mb-2">Full Name</label>
@@ -647,6 +651,13 @@ const volunteerOpportunities = [
               placeholder="Tell us more about your heart for ministry and how you'd like to serve..."
             ></textarea>
           </div>
+
+          <div class="flex items-start space-x-3">
+            <input id="ministry-consent" name="contactConsent" type="checkbox" required class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded" />
+            <label for="ministry-consent" class="text-sm text-neutral-600">
+              I consent to Omet Omeni Ministries using these details to respond to my ministry-interest request. *
+            </label>
+          </div>
           
           <button 
             type="submit"
@@ -659,6 +670,7 @@ const volunteerOpportunities = [
               </svg>
             </span>
           </button>
+          <p id="ministry-form-status" class="text-sm" role="status" aria-live="polite"></p>
         </form>
       </div>
     </div>
@@ -747,48 +759,43 @@ const volunteerOpportunities = [
     });
     
     // Ministry application form handling
-    const ministryForm = document.getElementById('ministry-form');
-    ministryForm?.addEventListener('submit', function(e) {
+    const ministryForm = document.querySelector<HTMLFormElement>('#ministry-form');
+    ministryForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      const button = this.querySelector('button[type="submit"]');
+      if (!ministryForm.checkValidity()) { ministryForm.reportValidity(); return; }
+      const button = ministryForm.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      const status = document.querySelector<HTMLElement>('#ministry-form-status')!;
       const originalText = button.innerHTML;
-      
-      button.innerHTML = `
-        <span class="flex items-center justify-center">
-          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Submitting...
-        </span>
-      `;
-      
-      // Simulate form submission
-      setTimeout(() => {
-        button.innerHTML = `
-          <span class="flex items-center justify-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            Application Submitted!
-          </span>
-        `;
-        
-        // Reset form
-        this.reset();
-        
-        // Reset button after 3 seconds
-        setTimeout(() => {
-          button.innerHTML = originalText;
-        }, 3000);
-      }, 2000);
+      button.disabled = true;
+      button.textContent = 'Submitting…';
+      status.className = 'text-sm text-neutral-600';
+      status.textContent = 'Sending your ministry interest…';
+      const formData = new FormData(ministryForm);
+      const data = Object.fromEntries(formData.entries());
+      data.availability = formData.getAll('availability').join(', ');
+      try {
+        const response = await fetch('/api/forms', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ kind: 'ministry-interest', ...data }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || typeof result.reference !== 'string') throw new Error();
+        ministryForm.reset();
+        status.className = 'text-sm font-medium text-green-700';
+        status.textContent = `Interest sent. Your reference is ${result.reference}.`;
+      } catch {
+        status.className = 'text-sm font-medium text-red-700';
+        status.textContent = 'We could not send your request. Your entries are still available; please try again or email hello@ometomeni.org.';
+      } finally {
+        button.disabled = false;
+        button.innerHTML = originalText;
+      }
     });
     
     // Learn more button functionality - Fixed selector
     const allButtons = document.querySelectorAll('button');
     const learnMoreButtons = Array.from(allButtons).filter(button => 
-      button.textContent.includes('Learn More')
+      button.textContent?.includes('Learn More')
     );
     
     learnMoreButtons.forEach(button => {
