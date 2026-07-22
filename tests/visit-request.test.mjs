@@ -46,8 +46,8 @@ test('page contains the required sections and no fake submission success', async
   for (const heading of ['Plan Your Visit', 'How would you like to connect?', 'Upcoming programmes', 'Choose a connection point', 'What to expect', 'Trust, privacy and safeguarding', 'Frequently asked questions', 'Take Your Next Step']) {
     assert.ok(page.includes(heading), `missing ${heading}`);
   }
-  assert.ok(form.includes('PUBLIC_VISIT_REQUEST_ENDPOINT'));
-  assert.ok(form.includes('if (!endpoint)'));
+  assert.ok(form.includes("const endpoint = '/api/forms'"));
+  assert.ok(form.includes("kind: 'visit-request'"));
   assert.equal(/localStorage|sessionStorage/.test(form), false);
   assert.equal(/<input[^>]*name="marketingConsent"[^>]*\schecked(?:\s|=|>)/.test(form), false);
 });

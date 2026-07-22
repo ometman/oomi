@@ -6,7 +6,7 @@ interface Props {
 }
 
 const { events } = Astro.props;
-const endpoint = import.meta.env.PUBLIC_VISIT_REQUEST_ENDPOINT ?? '';
+const endpoint = '/api/forms';
 ---
 
 <section id="plan-form" class="border-t border-neutral-100 py-20 bg-white scroll-mt-24" aria-labelledby="form-heading">
@@ -341,7 +341,7 @@ const endpoint = import.meta.env.PUBLIC_VISIT_REQUEST_ENDPOINT ?? '';
       }
       submit.disabled = true; status.className = 'mt-5 text-sm text-neutral-700'; status.textContent = 'Submitting your request…';
       try {
-        const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) });
+        const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ kind: 'visit-request', ...payload, company: fieldValue('company') }) });
         const result = await response.json().catch(() => ({}));
         if (!response.ok || typeof result.reference !== 'string') throw new Error('Submission was not accepted.');
         const messages: Record<VisitType, string> = {
