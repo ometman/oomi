@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import NewsletterSignup from '../components/newsletter/NewsletterSignup.astro';
 
 // Sample events data - in a real application, this would come from a CMS or database
 const upcomingEvents = [
@@ -455,19 +456,7 @@ function getDaysUntil(dateString: string) {
             </div>
             
             <div>
-              <form class="space-y-4">
-                <input 
-                  type="email" 
-                  placeholder="Enter your email address"
-                  class="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-                <button 
-                  type="submit"
-                  class="w-full bg-primary-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-primary-700 transition-colors"
-                >
-                  Subscribe to Updates
-                </button>
-              </form>
+              <NewsletterSignup source="EVENTS" title="Event notifications" description="Subscribe for relevant programmes and ministry updates." defaultInterests={['EVENTS', 'GENERAL_UPDATES']} compact />
               
               <div class="mt-6 flex justify-center space-x-4">
                 <a href="#" class="text-primary-600 hover:text-primary-700 font-medium text-sm">
@@ -519,12 +508,12 @@ function getDaysUntil(dateString: string) {
 <script>
   // Event filtering functionality
   document.addEventListener('DOMContentLoaded', function() {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const eventCards = document.querySelectorAll('.event-card');
+    const filterButtons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const eventCards = document.querySelectorAll<HTMLElement>('.event-card');
     
     filterButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const category = this.getAttribute('data-category');
+      button.addEventListener('click', () => {
+        const category = button.dataset.category;
         
         // Update active button
         filterButtons.forEach(btn => {
@@ -536,12 +525,12 @@ function getDaysUntil(dateString: string) {
           }
         });
         
-        if (this.classList.contains('bg-primary-100')) {
-          this.classList.remove('bg-primary-100', 'text-primary-700');
-          this.classList.add('bg-primary-600', 'text-white');
+        if (button.classList.contains('bg-primary-100')) {
+          button.classList.remove('bg-primary-100', 'text-primary-700');
+          button.classList.add('bg-primary-600', 'text-white');
         } else {
-          this.classList.remove('bg-secondary-100', 'text-secondary-700');
-          this.classList.add('bg-secondary-600', 'text-white');
+          button.classList.remove('bg-secondary-100', 'text-secondary-700');
+          button.classList.add('bg-secondary-600', 'text-white');
         }
         
         // Filter events
@@ -556,35 +545,6 @@ function getDaysUntil(dateString: string) {
       });
     });
     
-    // Newsletter subscription
-    const subscriptionForm = document.querySelector('form');
-    subscriptionForm?.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const button = this.querySelector('button[type="submit"]');
-      const originalText = button.textContent;
-      
-      button.textContent = 'Subscribing...';
-      button.disabled = true;
-      
-      // Simulate subscription
-      setTimeout(() => {
-        button.textContent = 'Subscribed!';
-        button.classList.remove('bg-primary-600', 'hover:bg-primary-700');
-        button.classList.add('bg-green-600');
-        
-        // Reset form
-        this.reset();
-        
-        // Reset button after 3 seconds
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.disabled = false;
-          button.classList.remove('bg-green-600');
-          button.classList.add('bg-primary-600', 'hover:bg-primary-700');
-        }, 3000);
-      }, 2000);
-    });
   });
 </script>
 
