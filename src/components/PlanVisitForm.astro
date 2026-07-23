@@ -1,5 +1,6 @@
 ---
 import type { MinistryEvent } from '../data/events';
+import NewsletterSignup from './newsletter/NewsletterSignup.astro';
 
 interface Props {
   events: MinistryEvent[];
@@ -171,6 +172,7 @@ const endpoint = '/api/forms';
         <div><dt class="font-semibold text-neutral-900">Expected response</dt><dd class="mt-1 text-neutral-700">The ministry will respond through your selected contact method.</dd></div>
       </dl>
       <div class="mt-8 flex flex-wrap gap-4"><a href="/events" class="font-semibold text-primary-700 underline">View Events</a><a href="/sermons" class="font-semibold text-primary-700 underline">Explore Sermons</a><a href="/contact" class="font-semibold text-primary-700 underline">Contact the Ministry</a></div>
+      <div class="mt-10 border-t border-green-200 pt-8"><NewsletterSignup source="PLAN_VISIT_CONFIRMATION" title="Keep in touch" description="Newsletter consent is separate from your visit request. Subscribe only if you would like future ministry updates." compact /></div>
     </section>
   </div>
 </section>

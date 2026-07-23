@@ -435,7 +435,7 @@ const volunteerOpportunities = [
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {leadershipTeam.map((leader, index) => (
+        {leadershipTeam.map((leader) => (
           <div class="text-center group">
             <div class={`w-24 h-24 mx-auto mb-4 rounded-2xl flex items-center justify-center ${
               leader.image === 'primary' 
@@ -716,12 +716,12 @@ const volunteerOpportunities = [
 <script>
   // Ministry filtering functionality
   document.addEventListener('DOMContentLoaded', function() {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const ministryCards = document.querySelectorAll('.ministry-card');
+    const filterButtons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const ministryCards = document.querySelectorAll<HTMLElement>('.ministry-card');
     
     filterButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const category = this.getAttribute('data-category');
+      button.addEventListener('click', () => {
+        const category = button.dataset.category;
         
         // Update active button
         filterButtons.forEach(btn => {
@@ -735,15 +735,15 @@ const volunteerOpportunities = [
           }
         });
         
-        if (this.classList.contains('bg-primary-100')) {
-          this.classList.remove('bg-primary-100', 'text-primary-700');
-          this.classList.add('bg-primary-600', 'text-white');
-        } else if (this.classList.contains('bg-secondary-100')) {
-          this.classList.remove('bg-secondary-100', 'text-secondary-700');
-          this.classList.add('bg-secondary-600', 'text-white');
+        if (button.classList.contains('bg-primary-100')) {
+          button.classList.remove('bg-primary-100', 'text-primary-700');
+          button.classList.add('bg-primary-600', 'text-white');
+        } else if (button.classList.contains('bg-secondary-100')) {
+          button.classList.remove('bg-secondary-100', 'text-secondary-700');
+          button.classList.add('bg-secondary-600', 'text-white');
         } else {
-          this.classList.remove('bg-neutral-100', 'text-neutral-700');
-          this.classList.add('bg-neutral-600', 'text-white');
+          button.classList.remove('bg-neutral-100', 'text-neutral-700');
+          button.classList.add('bg-neutral-600', 'text-white');
         }
         
         // Filter ministries

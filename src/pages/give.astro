@@ -547,21 +547,21 @@ const paymentMethods = [
   // Giving form functionality
   document.addEventListener('DOMContentLoaded', function() {
     // Handle suggested amount buttons
-    const amountButtons = document.querySelectorAll('button[class*="border-primary-200"], button[class*="border-secondary-200"]');
+    const amountButtons = document.querySelectorAll<HTMLButtonElement>('button[class*="border-primary-200"], button[class*="border-secondary-200"]');
     
     amountButtons.forEach(button => {
-      button.addEventListener('click', function() {
+      button.addEventListener('click', () => {
         // Remove active state from siblings
-        const siblings = this.parentElement.querySelectorAll('button');
+        const siblings = button.parentElement?.querySelectorAll<HTMLButtonElement>('button') ?? [];
         siblings.forEach(sibling => {
           sibling.classList.remove('bg-primary-100', 'bg-secondary-100');
         });
         
         // Add active state to clicked button
-        if (this.classList.contains('border-primary-200')) {
-          this.classList.add('bg-primary-100');
+        if (button.classList.contains('border-primary-200')) {
+          button.classList.add('bg-primary-100');
         } else {
-          this.classList.add('bg-secondary-100');
+          button.classList.add('bg-secondary-100');
         }
       });
     });

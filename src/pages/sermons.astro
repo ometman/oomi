@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import NewsletterSignup from '../components/newsletter/NewsletterSignup.astro';
 
 // Sample sermon data - in a real application, this would come from a CMS or database
 const sermons = [
@@ -622,23 +623,7 @@ function getTimeAgo(dateString: string) {
         
         <!-- Newsletter Signup -->
         <div class="bg-white rounded-2xl p-8 text-neutral-900">
-          <h3 class="text-2xl font-semibold mb-4">Get Sermon Notifications</h3>
-          <p class="text-neutral-600 mb-6">
-            Subscribe to receive email notifications when new sermons are available
-          </p>
-          <form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input 
-              type="email" 
-              placeholder="Enter your email address"
-              class="flex-1 px-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-            <button 
-              type="submit"
-              class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors font-medium"
-            >
-              Subscribe
-            </button>
-          </form>
+          <NewsletterSignup source="SERMONS" title="Get sermon notifications" description="Receive new teachings and the ministry updates you select." defaultInterests={['SERMONS_TEACHINGS']} />
         </div>
       </div>
     </div>
@@ -650,49 +635,49 @@ function getTimeAgo(dateString: string) {
 <script>
   // Sermon filtering and search functionality
   document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('sermon-search');
-    const seriesFilters = document.querySelectorAll('.series-filter');
-    const topicFilters = document.querySelectorAll('.topic-filter');
-    const sermonCards = document.querySelectorAll('.sermon-card');
+    const searchInput = document.querySelector<HTMLInputElement>('#sermon-search');
+    const seriesFilters = document.querySelectorAll<HTMLButtonElement>('.series-filter');
+    const topicFilters = document.querySelectorAll<HTMLButtonElement>('.topic-filter');
+    const sermonCards = document.querySelectorAll<HTMLElement>('.sermon-card');
     
     let currentSeries = 'all';
     let currentTopic = 'all';
     let currentSearch = '';
     
     // Search functionality
-    searchInput?.addEventListener('input', function() {
-      currentSearch = this.value.toLowerCase();
+    searchInput?.addEventListener('input', () => {
+      currentSearch = searchInput.value.toLowerCase();
       filterSermons();
     });
     
     // Series filter functionality
     seriesFilters.forEach(filter => {
-      filter.addEventListener('click', function() {
+      filter.addEventListener('click', () => {
         // Update active state
         seriesFilters.forEach(f => {
           f.classList.remove('bg-primary-600', 'text-white');
           f.classList.add('bg-primary-100', 'text-primary-700');
         });
-        this.classList.remove('bg-primary-100', 'text-primary-700');
-        this.classList.add('bg-primary-600', 'text-white');
+        filter.classList.remove('bg-primary-100', 'text-primary-700');
+        filter.classList.add('bg-primary-600', 'text-white');
         
-        currentSeries = this.getAttribute('data-series');
+        currentSeries = filter.dataset.series || 'all';
         filterSermons();
       });
     });
     
     // Topic filter functionality
     topicFilters.forEach(filter => {
-      filter.addEventListener('click', function() {
+      filter.addEventListener('click', () => {
         // Update active state
         topicFilters.forEach(f => {
           f.classList.remove('bg-secondary-600', 'text-white');
           f.classList.add('bg-secondary-100', 'text-secondary-700');
         });
-        this.classList.remove('bg-secondary-100', 'text-secondary-700');
-        this.classList.add('bg-secondary-600', 'text-white');
+        filter.classList.remove('bg-secondary-100', 'text-secondary-700');
+        filter.classList.add('bg-secondary-600', 'text-white');
         
-        currentTopic = this.getAttribute('data-topic');
+        currentTopic = filter.dataset.topic || 'all';
         filterSermons();
       });
     });
@@ -701,9 +686,9 @@ function getTimeAgo(dateString: string) {
     function filterSermons() {
       sermonCards.forEach(card => {
         const series = card.getAttribute('data-series');
-        const topic = card.getAttribute('data-topic');
-        const speaker = card.getAttribute('data-speaker');
-        const title = card.getAttribute('data-title');
+        const topic = card.dataset.topic || '';
+        const speaker = card.dataset.speaker || '';
+        const title = card.dataset.title || '';
         
         const matchesSeries = currentSeries === 'all' || series === currentSeries;
         const matchesTopic = currentTopic === 'all' || topic === currentTopic;
@@ -720,36 +705,6 @@ function getTimeAgo(dateString: string) {
         }
       });
     }
-    
-    // Newsletter subscription
-    const newsletterForm = document.querySelector('form');
-    newsletterForm?.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const button = this.querySelector('button[type="submit"]');
-      const originalText = button.textContent;
-      
-      button.textContent = 'Subscribing...';
-      button.disabled = true;
-      
-      // Simulate subscription
-      setTimeout(() => {
-        button.textContent = 'Subscribed!';
-        button.classList.remove('bg-primary-600', 'hover:bg-primary-700');
-        button.classList.add('bg-green-600');
-        
-        // Reset form
-        this.reset();
-        
-        // Reset button after 3 seconds
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.disabled = false;
-          button.classList.remove('bg-green-600');
-          button.classList.add('bg-primary-600', 'hover:bg-primary-700');
-        }, 3000);
-      }, 2000);
-    });
     
     // Video/Audio player simulation
     const playButtons = document.querySelectorAll('button:has(svg path[d="M8 5v14l11-7z"])');
