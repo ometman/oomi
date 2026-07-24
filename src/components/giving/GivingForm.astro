@@ -1,0 +1,211 @@
+---
+import { GIVING_DESIGNATIONS } from '../../lib/giving';
+
+interface Props {
+  enabled: boolean;
+}
+
+const { enabled } = Astro.props;
+const givingOptions = [
+  { id: 'MOBILE_MONEY', label: 'Mobile Money', available: true },
+  { id: 'GHANAPAY', label: 'GhanaPay', available: false },
+  { id: 'BANK_TRANSFER', label: 'Bank Transfer', available: false },
+  { id: 'CARD', label: 'Card', available: false },
+  { id: 'PAYPAL', label: 'PayPal', available: false },
+] as const;
+---
+
+<section id="online-giving" class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-lg sm:p-10" aria-labelledby="giving-form-heading">
+  <div class="flex items-start gap-4">
+    <div class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-primary-100 text-primary-700" aria-hidden="true">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+    </div>
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-wider text-primary-600">Secure online giving</p>
+      <h2 id="giving-form-heading" class="mt-2 text-3xl font-display font-bold text-neutral-900">Choose how you would like to give</h2>
+      <p class="mt-3 text-neutral-600">Mobile Money is currently available. Additional methods will be introduced after their provider accounts and backend processing are verified.</p>
+    </div>
+  </div>
+
+  {!enabled && <div class="mt-8 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900" role="status">Mobile Money processing is being configured. You can review the form, but submission remains unavailable until the verified provider account is connected.</div>}
+
+  <div class="mt-8 grid gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-950 sm:grid-cols-2">
+    <p><span class="font-semibold">Local giving:</span> Mobile Money is currently available through supported Ghana networks.</p>
+    <p><span class="font-semibold">International giving:</span> Card and PayPal giving are coming soon.</p>
+  </div>
+
+  <form id="giving-form" class="mt-8 space-y-6" novalidate data-payment-enabled={String(enabled)}>
+    <div class="absolute -left-[10000px]" aria-hidden="true"><label for="giving-company">Leave this field empty</label><input id="giving-company" name="company" tabindex="-1" autocomplete="off" /></div>
+
+    <fieldset>
+      <legend class="text-sm font-medium text-neutral-700">Giving option *</legend>
+      <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {givingOptions.map((option) => (
+          <label class:list={['flex cursor-pointer items-center gap-2 rounded-xl border p-3 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 has-[:checked]:ring-2 has-[:checked]:ring-primary-500', option.available ? 'border-neutral-300' : 'border-neutral-200 bg-neutral-50']}>
+            <input type="radio" name="givingOption" value={option.id} checked={option.id === 'MOBILE_MONEY'} class="h-4 w-4 flex-none text-primary-600 focus:ring-primary-500" />
+            <span class="min-w-0"><span class="block text-sm font-semibold text-neutral-900">{option.label}</span>{!option.available && <span class="block text-xs text-neutral-500">Coming soon</span>}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+
+    <div data-option-panel="mobile-money" class="space-y-6">
+      <fieldset>
+        <legend class="block text-sm font-medium text-neutral-700">Amount (GHS) *</legend>
+        <div class="mt-3 flex flex-wrap items-stretch gap-2">
+          {[50, 100, 250, 500].map((amount) => <label class="flex cursor-pointer items-center gap-2 rounded-lg border border-neutral-300 px-3 py-3 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 has-[:checked]:ring-2 has-[:checked]:ring-primary-500"><input type="radio" name="amountChoice" value={amount} class="h-4 w-4 text-primary-600 focus:ring-primary-500" /><span>{amount}</span></label>)}
+          <label class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-lg border border-neutral-300 px-3 py-2 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 has-[:checked]:ring-2 has-[:checked]:ring-primary-500">
+            <input type="radio" name="amountChoice" value="OTHER" class="h-4 w-4 text-primary-600 focus:ring-primary-500" /><span class="flex-none">Other</span>
+            <input id="giving-amount" name="otherAmountGhs" type="number" min="1" max="100000" step="0.01" inputmode="decimal" aria-label="Other amount in GHS" placeholder="Enter amount" class="min-w-[7rem] flex-1 rounded-md border border-neutral-300 bg-white px-3 py-1.5 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+          </label>
+        </div>
+        <p class="mt-1 text-sm text-red-700" data-error-for="amountGhs"></p>
+      </fieldset>
+
+      <div>
+        <label for="giving-designation" class="block text-sm font-medium text-neutral-700">Giving designation *</label>
+        <select id="giving-designation" name="designation" required class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500">{GIVING_DESIGNATIONS.map((designation) => <option value={designation.id}>{designation.label}</option>)}</select>
+        <p class="mt-1 text-sm text-red-700" data-error-for="designation"></p>
+      </div>
+      <input type="hidden" name="channel" value="MOBILE_MONEY" />
+
+      <fieldset class="rounded-xl border border-neutral-200 p-4">
+        <legend class="px-1 text-sm font-medium text-neutral-700">Mobile Money particulars *</legend>
+        <p class="mb-4 text-sm text-neutral-600">We send these details securely to the payment provider. You enter your PIN only on your phone.</p>
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div><label for="mobile-money-provider" class="block text-sm font-medium text-neutral-700">Network *</label><select id="mobile-money-provider" name="mobileMoneyProvider" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"><option value="">Choose network</option><option value="mtn">MTN MoMo</option><option value="atl">AT Money</option><option value="vod">Telecel Cash</option></select><p class="mt-1 text-sm text-red-700" data-error-for="mobileMoneyProvider"></p></div>
+          <div><label for="mobile-money-phone" class="block text-sm font-medium text-neutral-700">Mobile Money number *</label><input id="mobile-money-phone" name="mobileMoneyPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="0XXXXXXXXX" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" /><p class="mt-1 text-sm text-red-700" data-error-for="mobileMoneyPhone"></p></div>
+        </div>
+      </fieldset>
+
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div><label for="giving-first-name" class="block text-sm font-medium text-neutral-700">First name</label><input id="giving-first-name" name="firstName" autocomplete="given-name" maxlength="80" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" /></div>
+        <div><label for="giving-email" class="block text-sm font-medium text-neutral-700">Email address *</label><input id="giving-email" name="email" type="email" autocomplete="email" maxlength="254" required class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" /><p class="mt-1 text-sm text-red-700" data-error-for="email"></p></div>
+      </div>
+
+      <label class="flex items-start gap-3 text-sm text-neutral-700"><input name="consentGiven" type="checkbox" required class="mt-1 h-4 w-4 flex-none rounded text-primary-600 focus:ring-primary-500" /><span>I understand that Paystack will process this payment and that completion must be confirmed by the payment provider. *</span></label>
+      <p class="text-sm text-red-700" data-error-for="consentGiven"></p>
+      <button type="submit" disabled={!enabled} class="w-full rounded-lg bg-primary-600 px-6 py-4 font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">{enabled ? 'Request Mobile Money payment' : 'Mobile Money is being configured'}</button>
+      <p id="giving-form-status" class="text-sm" role="status" aria-live="polite"></p>
+    </div>
+
+    <fieldset data-option-panel="GHANAPAY" hidden disabled class="space-y-5 rounded-xl border border-neutral-200 bg-neutral-50 p-5 disabled:opacity-70">
+      <legend class="px-2 font-semibold text-neutral-900">GhanaPay payment details <span class="ml-2 text-xs font-medium text-neutral-500">Coming soon</span></legend>
+      <p class="text-sm text-neutral-600">The completed form will send a payment request to the donor’s registered GhanaPay wallet. No GhanaPay PIN will be entered on this website.</p>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div><label for="ghanapay-phone" class="block text-sm font-medium text-neutral-700">GhanaPay wallet number *</label><input id="ghanapay-phone" type="tel" placeholder="0XXXXXXXXX" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="ghanapay-name" class="block text-sm font-medium text-neutral-700">Account holder name *</label><input id="ghanapay-name" autocomplete="name" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="ghanapay-email" class="block text-sm font-medium text-neutral-700">Receipt email *</label><input id="ghanapay-email" type="email" autocomplete="email" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="ghanapay-amount" class="block text-sm font-medium text-neutral-700">Amount (GHS) *</label><input id="ghanapay-amount" type="number" min="1" step="0.01" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+      </div>
+      <div><label for="ghanapay-designation" class="block text-sm font-medium text-neutral-700">Giving designation *</label><select id="ghanapay-designation" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3">{GIVING_DESIGNATIONS.map((designation) => <option>{designation.label}</option>)}</select></div>
+      <button type="button" class="w-full rounded-lg bg-neutral-400 px-6 py-4 font-semibold text-white">Request GhanaPay payment — Coming soon</button>
+    </fieldset>
+
+    <fieldset data-option-panel="BANK_TRANSFER" hidden disabled class="space-y-5 rounded-xl border border-neutral-200 bg-neutral-50 p-5 disabled:opacity-70">
+      <legend class="px-2 font-semibold text-neutral-900">Bank transfer notification <span class="ml-2 text-xs font-medium text-neutral-500">Coming soon</span></legend>
+      <p class="text-sm text-neutral-600">Verified ministry bank instructions will appear here. After transferring, the donor will submit the particulars needed for backend reconciliation.</p>
+      <div class="rounded-lg border border-neutral-200 bg-white p-4 text-sm text-neutral-600">Recipient bank, account name, account number, branch and SWIFT/BIC will be supplied from verified environment configuration.</div>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div><label for="bank-donor-name" class="block text-sm font-medium text-neutral-700">Donor or account name *</label><input id="bank-donor-name" autocomplete="name" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="bank-donor-email" class="block text-sm font-medium text-neutral-700">Receipt email *</label><input id="bank-donor-email" type="email" autocomplete="email" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="bank-sender-bank" class="block text-sm font-medium text-neutral-700">Sending bank *</label><input id="bank-sender-bank" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="bank-reference" class="block text-sm font-medium text-neutral-700">Transfer reference *</label><input id="bank-reference" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="bank-amount" class="block text-sm font-medium text-neutral-700">Amount transferred *</label><input id="bank-amount" type="number" min="1" step="0.01" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="bank-currency" class="block text-sm font-medium text-neutral-700">Currency *</label><select id="bank-currency" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3"><option>GHS</option><option>USD</option><option>GBP</option><option>EUR</option></select></div>
+        <div><label for="bank-date" class="block text-sm font-medium text-neutral-700">Transfer date *</label><input id="bank-date" type="date" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="bank-designation" class="block text-sm font-medium text-neutral-700">Giving designation *</label><select id="bank-designation" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3">{GIVING_DESIGNATIONS.map((designation) => <option>{designation.label}</option>)}</select></div>
+      </div>
+      <button type="button" class="w-full rounded-lg bg-neutral-400 px-6 py-4 font-semibold text-white">Submit transfer particulars — Coming soon</button>
+    </fieldset>
+
+    <fieldset data-option-panel="CARD" hidden disabled class="space-y-5 rounded-xl border border-neutral-200 bg-neutral-50 p-5 disabled:opacity-70">
+      <legend class="px-2 font-semibold text-neutral-900">Card payment <span class="ml-2 text-xs font-medium text-neutral-500">Coming soon</span></legend>
+      <p class="text-sm text-neutral-600">The ministry site will collect only the transaction particulars below, then open provider-hosted checkout for card number, expiry date, CVV and authentication.</p>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div><label for="card-name" class="block text-sm font-medium text-neutral-700">Name *</label><input id="card-name" autocomplete="name" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="card-email" class="block text-sm font-medium text-neutral-700">Receipt email *</label><input id="card-email" type="email" autocomplete="email" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="card-amount" class="block text-sm font-medium text-neutral-700">Amount (GHS) *</label><input id="card-amount" type="number" min="1" step="0.01" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="card-designation" class="block text-sm font-medium text-neutral-700">Giving designation *</label><select id="card-designation" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3">{GIVING_DESIGNATIONS.map((designation) => <option>{designation.label}</option>)}</select></div>
+      </div>
+      <button type="button" class="w-full rounded-lg bg-neutral-400 px-6 py-4 font-semibold text-white">Continue to secure card checkout — Coming soon</button>
+    </fieldset>
+
+    <fieldset data-option-panel="PAYPAL" hidden disabled class="space-y-5 rounded-xl border border-neutral-200 bg-neutral-50 p-5 disabled:opacity-70">
+      <legend class="px-2 font-semibold text-neutral-900">PayPal payment <span class="ml-2 text-xs font-medium text-neutral-500">Coming soon</span></legend>
+      <p class="text-sm text-neutral-600">These particulars will create a server-side PayPal order. The donor will sign in and approve payment only on PayPal.</p>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div><label for="paypal-name" class="block text-sm font-medium text-neutral-700">Name *</label><input id="paypal-name" autocomplete="name" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="paypal-email" class="block text-sm font-medium text-neutral-700">Receipt email *</label><input id="paypal-email" type="email" autocomplete="email" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="paypal-amount" class="block text-sm font-medium text-neutral-700">Amount *</label><input id="paypal-amount" type="number" min="1" step="0.01" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3" /></div>
+        <div><label for="paypal-currency" class="block text-sm font-medium text-neutral-700">Currency *</label><select id="paypal-currency" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3"><option>USD</option><option>GBP</option><option>EUR</option></select></div>
+        <div class="sm:col-span-2"><label for="paypal-designation" class="block text-sm font-medium text-neutral-700">Giving designation *</label><select id="paypal-designation" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3">{GIVING_DESIGNATIONS.map((designation) => <option>{designation.label}</option>)}</select></div>
+      </div>
+      <button type="button" class="w-full rounded-lg bg-neutral-400 px-6 py-4 font-semibold text-white">Continue to PayPal — Coming soon</button>
+    </fieldset>
+  </form>
+</section>
+
+<script>
+  import { validateGivingRequest } from '../../lib/giving';
+  const form = document.querySelector<HTMLFormElement>('#giving-form');
+  if (form) {
+    const amountChoice = () => form.querySelector<HTMLInputElement>('[name="amountChoice"]:checked')?.value || '';
+    const otherAmount = form.querySelector<HTMLInputElement>('[name="otherAmountGhs"]')!;
+    form.querySelectorAll<HTMLInputElement>('[name="amountChoice"]').forEach((radio) => radio.addEventListener('change', () => {
+      otherAmount.required = amountChoice() === 'OTHER';
+      if (otherAmount.required) otherAmount.focus();
+    }));
+    otherAmount.addEventListener('focus', () => {
+      const otherChoice = form.querySelector<HTMLInputElement>('[name="amountChoice"][value="OTHER"]');
+      if (otherChoice) { otherChoice.checked = true; otherAmount.required = true; }
+    });
+
+    const mobileMoneyPanel = form.querySelector<HTMLElement>('[data-option-panel="mobile-money"]')!;
+    const unavailablePanels = form.querySelectorAll<HTMLFieldSetElement>('[data-option-panel]:not([data-option-panel="mobile-money"])');
+    const syncGivingOption = () => {
+      const option = form.querySelector<HTMLInputElement>('[name="givingOption"]:checked')?.value || 'MOBILE_MONEY';
+      const mobileSelected = option === 'MOBILE_MONEY';
+      mobileMoneyPanel.hidden = !mobileSelected;
+      unavailablePanels.forEach((panel) => { panel.hidden = panel.dataset.optionPanel !== option; });
+      mobileMoneyPanel.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLButtonElement>('input, select, button').forEach((control) => {
+        control.disabled = !mobileSelected || (control.type === 'submit' && form.dataset.paymentEnabled !== 'true');
+      });
+    };
+    form.querySelectorAll<HTMLInputElement>('[name="givingOption"]').forEach((input) => input.addEventListener('change', syncGivingOption));
+    syncGivingOption();
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      const status = form.querySelector<HTMLElement>('#giving-form-status')!;
+      form.querySelectorAll<HTMLElement>('[data-error-for]').forEach((node) => { node.textContent = ''; });
+      const data = new FormData(form);
+      const payload = {
+        amountGhs: amountChoice() === 'OTHER' ? data.get('otherAmountGhs') : amountChoice(),
+        designation: data.get('designation'), channel: 'MOBILE_MONEY', givingRegion: 'LOCAL',
+        mobileMoneyProvider: data.get('mobileMoneyProvider'), mobileMoneyPhone: data.get('mobileMoneyPhone'),
+        email: data.get('email'), firstName: data.get('firstName'), consentGiven: data.get('consentGiven') === 'on', company: data.get('company'),
+      };
+      const validation = validateGivingRequest(payload);
+      if (!validation.valid) {
+        Object.entries(validation.errors).forEach(([field, message]) => { const node = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`); if (node) node.textContent = message; });
+        status.className = 'text-sm font-medium text-red-700'; status.textContent = 'Please review the highlighted fields.'; return;
+      }
+      if (form.dataset.paymentEnabled !== 'true') { status.className = 'text-sm font-medium text-amber-800'; status.textContent = 'Mobile Money is still being configured. No payment has been taken.'; return; }
+      button.disabled = true; button.textContent = 'Sending payment request...';
+      status.className = 'text-sm text-neutral-600'; status.textContent = 'Connecting securely. No payment has been taken yet.';
+      try {
+        const response = await fetch('/api/giving/initialize', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || result.status !== 'PENDING' || typeof result.reference !== 'string') throw new Error();
+        status.className = 'text-sm font-medium text-green-800';
+        status.textContent = typeof result.displayText === 'string' ? result.displayText : 'Approve the payment on your phone.';
+        window.setTimeout(() => window.location.assign(`/give/complete?reference=${encodeURIComponent(result.reference)}`), 4000);
+      } catch {
+        status.className = 'text-sm font-medium text-red-700'; status.textContent = 'We could not send the Mobile Money request. No payment has been taken. Please try again later.';
+        button.disabled = false; button.textContent = 'Request Mobile Money payment';
+      }
+    });
+  }
+</script>
