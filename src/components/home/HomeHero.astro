@@ -1,0 +1,67 @@
+---
+import { Image } from 'astro:assets';
+import heroImage from '../../assets/oomi-home-hero.png';
+---
+
+<section class="relative isolate overflow-hidden bg-primary-900 text-white" aria-labelledby="home-hero-heading">
+  <Image
+    src={heroImage}
+    alt=""
+    widths={[640, 960, 1280, 1536]}
+    sizes="100vw"
+    quality={90}
+    loading="eager"
+    fetchpriority="high"
+    class="absolute inset-0 z-0 h-full w-full object-cover contrast-110 saturate-110 [object-position:70%_34%] lg:[object-position:70%_30%]"
+  />
+  <div class="hero-readability-overlay absolute inset-0 z-[1]"></div>
+  <div class="absolute inset-x-0 bottom-0 z-[1] h-28 bg-gradient-to-t from-neutral-900/35 to-transparent"></div>
+
+  <div class="relative z-10 mx-auto grid min-h-[700px] max-w-7xl items-center px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:px-8 lg:py-24">
+    <div class="max-w-2xl drop-shadow-[0_2px_16px_rgba(0,0,0,0.32)]">
+      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-secondary-300">Welcome to</p>
+      <h1 id="home-hero-heading" class="mt-5 text-4xl font-display font-bold uppercase leading-[1.02] sm:text-6xl lg:text-7xl">
+        Omet Omeni <span class="block text-secondary-300">Ministries</span>
+      </h1>
+      <div class="mt-6 h-1 w-20 rounded-full bg-secondary-400" aria-hidden="true"></div>
+      <p class="mt-6 max-w-xl text-lg leading-relaxed text-primary-50 sm:text-xl">
+        Raising a community of believers who know God, grow in Christ and impact the world through the power of the Holy Spirit.
+      </p>
+
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <a href="/sermons" class="inline-flex min-h-12 items-center justify-center rounded-lg bg-secondary-400 px-6 py-3 font-semibold text-neutral-900 shadow-lg shadow-black/20 transition-colors hover:bg-secondary-300 focus:outline-none focus:ring-2 focus:ring-secondary-200 focus:ring-offset-2 focus:ring-offset-primary-900">Watch Latest Message</a>
+        <a href="/events" class="inline-flex min-h-12 items-center justify-center rounded-lg border border-white/35 bg-white/10 px-6 py-3 font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-white">View Upcoming Events</a>
+      </div>
+
+      <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-white/20 pt-5 text-sm font-semibold text-primary-50" aria-label="Ministry locations">
+        {['Accra', 'Kumasi', 'Online'].map((location) => (
+          <span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-secondary-300" aria-hidden="true"></span>{location}</span>
+        ))}
+        <a href="/plan-your-visit" class="inline-flex min-h-11 items-center font-semibold text-secondary-200 underline decoration-secondary-400 underline-offset-4 focus:outline-none focus:ring-2 focus:ring-secondary-200">Plan Your Visit</a>
+      </div>
+
+      <blockquote class="mt-7 max-w-xl border-l-2 border-secondary-300 pl-5 text-sm italic leading-relaxed text-primary-100 sm:text-base">
+        “Arise, shine, for your light has come, and the glory of the Lord rises upon you.”
+        <cite class="mt-2 block text-sm font-semibold not-italic text-secondary-200">Isaiah 60:1</cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-readability-overlay {
+    background: rgba(18, 56, 122, 0.62);
+  }
+
+  @media (min-width: 1024px) {
+    .hero-readability-overlay {
+      background: linear-gradient(
+        90deg,
+        rgba(16, 50, 111, 0.92) 0%,
+        rgba(16, 50, 111, 0.72) 34%,
+        rgba(16, 50, 111, 0.18) 61%,
+        rgba(16, 50, 111, 0) 80%
+      );
+    }
+  }
+</style>
