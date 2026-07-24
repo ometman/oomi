@@ -1,0 +1,84 @@
+---
+import {
+  getYouTubeEmbedUrl,
+  getYouTubeThumbnailUrl,
+  getYouTubeVideoId,
+} from '../../lib/youtube';
+
+interface Props {
+  url: string;
+  title: string;
+  thumbnail?: string;
+  eager?: boolean;
+  featured?: boolean;
+}
+
+const { url, title, thumbnail, eager = false, featured = false } = Astro.props;
+const videoId = getYouTubeVideoId(url);
+const embedUrl = getYouTubeEmbedUrl(url);
+const previewImage = thumbnail || getYouTubeThumbnailUrl(url);
+---
+
+{videoId && embedUrl ? (
+  <div
+    class:list={[
+      'youtube-player group relative overflow-hidden bg-neutral-900',
+      featured ? 'aspect-[4/3] lg:h-full lg:min-h-[620px] lg:aspect-auto' : 'aspect-video',
+    ]}
+    data-youtube-player
+    data-embed-url={embedUrl}
+    data-title={title}
+  >
+    {previewImage && (
+      <img
+        src={previewImage}
+        alt=""
+        width="960"
+        height="540"
+        loading={eager ? 'eager' : 'lazy'}
+        class="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+      />
+    )}
+    <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/80 via-neutral-900/20 to-transparent transition-colors duration-300 group-hover:via-neutral-900/10"></div>
+    <button
+      type="button"
+      class="absolute inset-0 flex min-h-12 w-full items-center justify-center p-6 text-white focus:outline-none focus:ring-4 focus:ring-inset focus:ring-secondary-300"
+      data-youtube-play
+      aria-label={`Play ${title}`}
+    >
+      <span class="flex h-16 w-16 items-center justify-center rounded-full bg-secondary-400 text-neutral-900 shadow-xl transition-[transform,background-color,box-shadow] duration-300 group-hover:scale-105 group-hover:bg-secondary-300 group-hover:shadow-[0_0_0_10px_rgba(251,191,36,0.16)]" aria-hidden="true">
+        <svg class="ml-1 h-7 w-7" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+      </span>
+    </button>
+    <p class="absolute inset-x-5 bottom-4 text-sm font-semibold text-white pointer-events-none">Play on this page</p>
+    <noscript>
+      <a href={url} target="_blank" rel="noopener noreferrer" class="absolute inset-0 flex items-center justify-center bg-neutral-900/80 p-6 font-semibold text-white underline">Watch {title} on YouTube</a>
+    </noscript>
+  </div>
+) : (
+  <div class="flex aspect-video items-center justify-center bg-neutral-900 p-6 text-center text-neutral-200">
+    This message does not have a valid YouTube link.
+  </div>
+)}
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-youtube-player]').forEach((player) => {
+    if (player.dataset.initialized === 'true') return;
+    player.dataset.initialized = 'true';
+
+    player.querySelector<HTMLButtonElement>('[data-youtube-play]')?.addEventListener('click', () => {
+      const embedUrl = player.dataset.embedUrl;
+      const title = player.dataset.title;
+      if (!embedUrl || !title) return;
+
+      const iframe = document.createElement('iframe');
+      iframe.src = embedUrl;
+      iframe.title = title;
+      iframe.className = 'absolute inset-0 h-full w-full';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.allowFullscreen = true;
+      player.replaceChildren(iframe);
+    });
+  });
+</script>
