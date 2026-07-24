@@ -8,10 +8,11 @@ export interface Props {
 const { 
   title, 
   description = "Omet Omeni Ministries - Preaching and Teaching Jesus Christ. Join us for worship, fellowship, and spiritual growth.",
-  image = "/og-image.jpg"
+  image = "/favicon.svg"
 } = Astro.props;
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
+const socialImageUrl = new URL(image, Astro.site ?? Astro.url.origin);
 ---
 
 <!doctype html>
@@ -28,41 +29,19 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin)
     <link rel="canonical" href={canonicalUrl} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={image} />
+    <meta property="og:image" content={socialImageUrl} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={image} />
+    <meta name="twitter:image" content={socialImageUrl} />
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
     
-    <!-- Structured Data -->
-    <script type="application/ld+json" is:inline>
-      {
-        "@context": "https://schema.org",
-        "@type": "Church",
-        "name": "Omet Omeni Ministries",
-        "description": "Preaching and Teaching Jesus Christ",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Conference Hall, Royal Cockpit Hotel, Ahodwo-Nhyiaeso",
-          "addressLocality": "Kumasi",
-          "addressCountry": "Ghana"
-        },
-        "email": "hello@ometomeni.org",
-        "url": "https://ometomeni.org",
-        "sameAs": [
-          "https://www.facebook.com/oominternational",
-          "https://www.instagram.com/oominternational",
-          "https://www.youtube.com/@oominternational"
-        ]
-      }
-    </script>
   </head>
   <body class="font-sans text-neutral-800 bg-white">
     <slot />

@@ -1,0 +1,21 @@
+---
+import { ministryAreas } from '../../data/ministry-areas';
+---
+
+<section class="bg-neutral-50 py-20 sm:py-24" aria-labelledby="ministries-overview-heading">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl"><p class="text-sm font-semibold uppercase tracking-[0.2em] text-secondary-700">Grow and serve</p><h2 id="ministries-overview-heading" class="mt-3 text-3xl font-display font-bold text-neutral-900 sm:text-4xl">Ministry areas</h2><p class="mt-4 text-lg leading-relaxed text-neutral-600">Explore ways to receive biblical formation, connect in prayer and participate in kingdom-focused service.</p></div>
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {ministryAreas.map((ministry) => (
+        <article class="rounded-2xl border border-neutral-200 bg-white p-7 shadow-sm">
+          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary-100 text-secondary-800">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d={ministry.iconPath}></path></svg>
+          </div>
+          <h3 class="mt-5 text-xl font-semibold text-neutral-900">{ministry.name}</h3>
+          <p class="mt-3 leading-relaxed text-neutral-600">{ministry.description}</p>
+          <a href="/ministries" class="mt-5 inline-flex font-semibold text-primary-800 underline decoration-secondary-500 underline-offset-4">Learn More about {ministry.name}</a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
