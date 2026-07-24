@@ -1,0 +1,204 @@
+---
+import type { PublishedSermon } from '../../data/sermons';
+import { sermonPlaceholders } from '../../data/sermons';
+import YouTubePlayer from '../sermons/YouTubePlayer.astro';
+
+interface Props {
+  sermon?: PublishedSermon;
+}
+
+const { sermon } = Astro.props;
+const placeholder = sermonPlaceholders[0];
+const formattedDate = sermon
+  ? new Intl.DateTimeFormat('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(`${sermon.publishedAt}T12:00:00Z`))
+  : '';
+const scriptureReferences = sermon?.scriptureReferences?.length
+  ? sermon.scriptureReferences
+  : sermon?.scripture
+    ? [sermon.scripture]
+    : [];
+const formatMetric = (value: number | string | undefined) => {
+  if (typeof value === 'number') {
+    return new Intl.NumberFormat('en', {
+      notation: 'compact',
+      maximumFractionDigits: 1,
+    }).format(value);
+  }
+  return typeof value === 'string' && value.trim() ? value.trim() : '—';
+};
+---
+
+<section class="bg-white py-20 sm:py-24" aria-labelledby="featured-message-heading">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-secondary-700">Messages</p>
+        <h2 id="featured-message-heading" class="mt-3 text-3xl font-display font-bold text-neutral-900 sm:text-4xl">
+          Featured Message
+        </h2>
+      </div>
+      <a
+        href="/sermons"
+        class="font-semibold text-primary-800 underline decoration-secondary-500 underline-offset-4 transition-colors hover:text-primary-950 focus:outline-none focus:ring-2 focus:ring-primary-500"
+      >
+        View All Sermons
+      </a>
+    </div>
+
+    {sermon ? (
+      <article class="mt-12 overflow-hidden rounded-3xl border border-primary-100 bg-white shadow-[0_24px_70px_-36px_rgba(3,39,69,0.45)]">
+        <div class="grid lg:grid-cols-[1.15fr_0.85fr]">
+          <div class="bg-white p-7 pr-0 sm:p-10 sm:pr-0 lg:p-12 lg:pr-0">
+            <div id="featured-message-video" class="overflow-hidden rounded-l-2xl bg-gradient-to-br from-primary-950 to-neutral-900">
+              <YouTubePlayer
+                url={sermon.mediaUrl}
+                title={sermon.title}
+                thumbnail={sermon.thumbnail}
+                eager
+                featured
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col justify-center p-7 sm:p-10 lg:p-12">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded-full bg-secondary-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-secondary-800">
+                Latest message
+              </span>
+              {sermon.duration && (
+                <span class="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800">
+                  {sermon.duration}
+                </span>
+              )}
+            </div>
+
+            <p class="mt-6 text-sm font-semibold uppercase tracking-[0.16em] text-secondary-700">
+              {sermon.series || 'Ministry message'}
+            </p>
+            <h3 class="mt-3 text-3xl font-display font-bold leading-tight text-neutral-900 sm:text-4xl">
+              {sermon.title}
+            </h3>
+
+            <div class="mt-5 flex items-center gap-3 text-sm text-neutral-600">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-900 text-sm font-bold text-white" aria-hidden="true">
+                {sermon.speaker.split(/\s+/).map((part) => part[0]).slice(-2).join('')}
+              </span>
+              <p>
+                <span class="block font-semibold text-neutral-900">{sermon.speaker}</span>
+                <span>{formattedDate}</span>
+              </p>
+            </div>
+
+            {scriptureReferences.length > 0 && (
+              <div class="mt-6">
+                <p class="text-xs font-bold uppercase tracking-[0.16em] text-neutral-500">Scripture references</p>
+                <div class="mt-2 flex flex-wrap gap-2">
+                  {scriptureReferences.map((reference) => (
+                    <span class="inline-flex items-center rounded-md border border-primary-100 bg-primary-50 px-3 py-1.5 text-sm font-semibold text-primary-900">
+                      {reference}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <p class="mt-6 leading-relaxed text-neutral-600">{sermon.excerpt}</p>
+
+            <dl class="mt-7 grid grid-cols-3 divide-x divide-neutral-200 rounded-xl border border-neutral-200 bg-neutral-50 py-4">
+              <div class="flex items-center justify-center gap-2 px-2">
+                <dt class="sr-only">Views</dt>
+                <svg class="h-5 w-5 shrink-0 text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
+                  <circle cx="12" cy="12" r="2.75" stroke-width="1.8"></circle>
+                </svg>
+                <dd class="flex items-baseline gap-1 text-lg font-bold text-neutral-900">
+                  {formatMetric(sermon.viewCount)}
+                  <span class="hidden text-xs font-medium text-neutral-500 sm:inline">views</span>
+                </dd>
+              </div>
+              <div class="flex items-center justify-center gap-2 px-2">
+                <dt class="sr-only">Likes</dt>
+                <svg class="h-5 w-5 shrink-0 text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7.5 10.5v9H4.75a1.5 1.5 0 0 1-1.5-1.5v-6a1.5 1.5 0 0 1 1.5-1.5H7.5Zm0 0 3.75-6a2 2 0 0 1 2.5-.75c.9.42 1.35 1.45 1.05 2.4l-1.35 4.35h4.8a2.25 2.25 0 0 1 2.2 2.7l-.9 4.5a2.25 2.25 0 0 1-2.2 1.8H7.5"></path>
+                </svg>
+                <dd class="flex items-baseline gap-1 text-lg font-bold text-neutral-900">
+                  {formatMetric(sermon.likeCount)}
+                  <span class="hidden text-xs font-medium text-neutral-500 sm:inline">likes</span>
+                </dd>
+              </div>
+              <div class="flex items-center justify-center gap-2 px-2">
+                <dt class="sr-only">Comments</dt>
+                <svg class="h-5 w-5 shrink-0 text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20.25 11.25a7.5 7.5 0 0 1-8.05 7.48 8.8 8.8 0 0 1-3.45-.98L4 19l1.25-4.75a7.5 7.5 0 1 1 15-3Z"></path>
+                </svg>
+                <dd class="flex items-baseline gap-1 text-lg font-bold text-neutral-900">
+                  {formatMetric(sermon.commentCount)}
+                  <span class="hidden text-xs font-medium text-neutral-500 sm:inline">comments</span>
+                </dd>
+              </div>
+            </dl>
+
+            <div class="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <button
+                type="button"
+                data-featured-message-play
+                class="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-primary-800 px-5 py-3 font-semibold text-white shadow-md shadow-primary-900/20 transition-colors hover:bg-primary-950 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+              >
+                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 5v14l11-7z"></path>
+                </svg>
+                Play Video
+              </button>
+              {sermon.audioUrl && (
+                <a
+                  href={sermon.audioUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-primary-200 bg-white px-5 py-3 font-semibold text-primary-900 transition-colors hover:border-secondary-500 hover:bg-secondary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18V5l12-2v13M9 9l12-2M6 20a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm12-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path>
+                  </svg>
+                  Listen
+                  <span class="sr-only">to {sermon.title} on YouTube (opens in a new tab)</span>
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </article>
+    ) : (
+      <article class="mt-12 grid overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-50 shadow-lg lg:grid-cols-[0.9fr_1.1fr]">
+        <div class="flex min-h-64 items-center justify-center bg-gradient-to-br from-primary-900 to-neutral-900 text-secondary-300" aria-hidden="true">
+          <svg class="h-20 w-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M12 6.253v13m0-13C10.8 5.5 9.2 5 7.5 5S4.2 5.5 3 6.253v13C4.2 18.5 5.8 18 7.5 18s3.3.5 4.5 1.253m0-13C13.2 5.5 14.8 5 16.5 5s3.3.5 4.5 1.253v13C19.8 18.5 18.2 18 16.5 18s3.3.5 4.5 1.253"></path>
+          </svg>
+        </div>
+        <div class="p-8 sm:p-10">
+          <p class="text-sm font-semibold uppercase tracking-wider text-secondary-700">{placeholder.label}</p>
+          <h3 class="mt-3 text-3xl font-display font-bold text-neutral-900">{placeholder.title}</h3>
+          <p class="mt-4 leading-relaxed text-neutral-600">{placeholder.guidance}</p>
+          <p class="mt-5 rounded-lg border border-secondary-200 bg-secondary-50 p-4 text-sm text-neutral-700">
+            No ministry-approved featured message is currently published.
+          </p>
+          <a href="/sermons" class="mt-6 inline-flex font-semibold text-primary-800 underline decoration-secondary-500 underline-offset-4">
+            View Message Placeholders
+          </a>
+        </div>
+      </article>
+    )}
+  </div>
+</section>
+
+<script>
+  document.querySelector<HTMLButtonElement>('[data-featured-message-play]')?.addEventListener('click', () => {
+    const player = document.querySelector<HTMLElement>('#featured-message-video');
+    const playButton = player?.querySelector<HTMLButtonElement>('[data-youtube-play]');
+    player?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    playButton?.click();
+  });
+</script>

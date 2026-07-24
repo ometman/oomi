@@ -1,0 +1,23 @@
+---
+const locations = [
+  ['Accra', 'Connect with selected programmes and appointment-based ministry activities in Accra.', 'Explore Accra', '/plan-your-visit'],
+  ['Kumasi', 'Join approved ministry programmes and office-based services in Kumasi.', 'Explore Kumasi', '/events'],
+  ['Online', 'Participate in livestreams, online teaching, prayer and digital discipleship from anywhere.', 'Connect Online', '/contact'],
+];
+---
+
+<section class="bg-white py-20 sm:py-24" aria-labelledby="location-connection-heading">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="text-center"><p class="text-sm font-semibold uppercase tracking-[0.2em] text-secondary-700">One ministry, three connection points</p><h2 id="location-connection-heading" class="mt-3 text-3xl font-display font-bold text-neutral-900 sm:text-4xl">Connect in Accra, Kumasi or online</h2></div>
+    <div class="mt-12 grid gap-6 lg:grid-cols-3">
+      {locations.map(([name, description, action, href], index) => (
+        <article class="relative overflow-hidden rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-7 shadow-sm">
+          <span class="text-5xl font-display font-bold text-primary-100" aria-hidden="true">0{index + 1}</span>
+          <h3 class="mt-2 text-2xl font-display font-bold text-neutral-900">{name}</h3>
+          <p class="mt-4 leading-relaxed text-neutral-600">{description}</p>
+          <a href={href} class="mt-6 inline-flex min-h-11 items-center font-semibold text-primary-800 underline decoration-secondary-500 underline-offset-4">{action}</a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
