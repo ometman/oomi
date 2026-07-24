@@ -7,7 +7,7 @@ export interface Props {
 
 const { 
   title, 
-  description = "Omet Omeni Ministries - Preaching and Teaching Jesus Christ. Join us for worship, fellowship, and spiritual growth.",
+  description = "Omet Omeni Ministries proclaims Jesus Christ through biblical teaching, prayer, discipleship and online ministry.",
   image = "/og-image.jpg"
 } = Astro.props;
 
@@ -45,15 +45,10 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin)
     <script type="application/ld+json" is:inline>
       {
         "@context": "https://schema.org",
-        "@type": "Church",
+        "@type": "Organization",
         "name": "Omet Omeni Ministries",
         "description": "Preaching and Teaching Jesus Christ",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Conference Hall, Royal Cockpit Hotel, Ahodwo-Nhyiaeso",
-          "addressLocality": "Kumasi",
-          "addressCountry": "Ghana"
-        },
+        "areaServed": ["Accra", "Kumasi", "Online"],
         "email": "hello@ometomeni.org",
         "url": "https://ometomeni.org",
         "sameAs": [
