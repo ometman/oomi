@@ -7,8 +7,8 @@ export interface Props {
 
 const { 
   title, 
-  description = "Omet Omeni Ministries - Preaching and Teaching Jesus Christ. Join us for worship, fellowship, and spiritual growth.",
-  image = "/favicon.svg"
+  description = "Omet Omeni Ministries proclaims Jesus Christ through biblical teaching, prayer, discipleship and online ministry.",
+  image = "/og-image.jpg"
 } = Astro.props;
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
@@ -42,6 +42,23 @@ const socialImageUrl = new URL(image, Astro.site ?? Astro.url.origin);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
     
+    <!-- Structured Data -->
+    <script type="application/ld+json" is:inline>
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Omet Omeni Ministries",
+        "description": "Preaching and Teaching Jesus Christ",
+        "areaServed": ["Accra", "Kumasi", "Online"],
+        "email": "hello@ometomeni.org",
+        "url": "https://ometomeni.org",
+        "sameAs": [
+          "https://www.facebook.com/oominternational",
+          "https://www.instagram.com/oominternational",
+          "https://www.youtube.com/@oominternational"
+        ]
+      }
+    </script>
   </head>
   <body class="font-sans text-neutral-800 bg-white">
     <slot />
