@@ -21,10 +21,15 @@ const scriptureReferences = sermon?.scriptureReferences?.length
   : sermon?.scripture
     ? [sermon.scripture]
     : [];
-const formatMetric = (value: number | undefined) =>
-  typeof value === 'number'
-    ? new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(value)
-    : '—';
+const formatMetric = (value: number | string | undefined) => {
+  if (typeof value === 'number') {
+    return new Intl.NumberFormat('en', {
+      notation: 'compact',
+      maximumFractionDigits: 1,
+    }).format(value);
+  }
+  return typeof value === 'string' && value.trim() ? value.trim() : '—';
+};
 ---
 
 <section class="bg-white py-20 sm:py-24" aria-labelledby="featured-message-heading">
