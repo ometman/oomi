@@ -1,0 +1,16 @@
+---
+import type { MinistryEvent } from '../../data/events';
+import { createGoogleCalendarUrl, createICalendarContent, createICalendarFilename } from '../../lib/events';
+
+interface Props { event: MinistryEvent; }
+const { event } = Astro.props;
+const enabled = !['POSTPONED', 'CANCELLED'].includes(event.status);
+const icsHref = `data:text/calendar;charset=utf-8,${encodeURIComponent(createICalendarContent(event))}`;
+---
+
+{enabled && (
+  <div class="flex flex-wrap gap-3" aria-label="Calendar actions">
+    <a href={createGoogleCalendarUrl(event)} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center rounded-lg border border-primary-200 px-5 py-3 font-semibold text-primary-800 hover:bg-primary-50">Add to Google Calendar</a>
+    <a href={icsHref} download={createICalendarFilename(event)} class="inline-flex min-h-11 items-center rounded-lg border border-primary-200 px-5 py-3 font-semibold text-primary-800 hover:bg-primary-50">Download .ics</a>
+  </div>
+)}
