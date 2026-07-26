@@ -1,0 +1,57 @@
+---
+import { Image } from 'astro:assets';
+import fallbackImage from '../../assets/plan-visit-community-hero.png';
+import type { MinistryEvent } from '../../data/events';
+import { eventLabel, formatEventDate, formatEventTime, getEventCountdown } from '../../lib/events';
+
+interface Props {
+  event: MinistryEvent;
+  featured?: boolean;
+}
+
+const { event, featured = false } = Astro.props;
+const countdown = getEventCountdown(event);
+const canPlan = ['PUBLISHED', 'REGISTRATION_OPEN'].includes(event.status);
+---
+
+<article
+  class:list={['event-card flex flex-col overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-[0_18px_50px_-32px_rgba(30,58,138,0.5)]', featured && 'lg:grid lg:grid-cols-2']}
+  data-event-card
+  data-location={event.location}
+  data-format={event.format}
+  data-category={event.category}
+  data-month={event.date.slice(0, 7)}
+>
+  <div class:list={['relative overflow-hidden bg-primary-900', featured ? 'min-h-72' : 'h-52']}>
+    {event.image
+      ? <img src={event.image} alt="" loading={featured ? 'eager' : 'lazy'} width="800" height="500" class="h-full w-full object-cover" />
+      : <Image src={fallbackImage} alt="" format="webp" quality={78} loading={featured ? 'eager' : 'lazy'} class="h-full w-full object-cover" />}
+    <div class="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent"></div>
+    <div class="absolute left-4 top-4 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wider">
+      <span class="rounded-full bg-secondary-300 px-3 py-1 text-neutral-900">{eventLabel(event.category)}</span>
+      <span class="rounded-full bg-white/90 px-3 py-1 text-primary-900">{eventLabel(event.format)}</span>
+    </div>
+  </div>
+  <div class:list={['flex flex-1 flex-col', featured ? 'p-8 sm:p-10' : 'p-6']}>
+    <div class="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wider">
+      <span class="rounded-full bg-primary-100 px-3 py-1 text-primary-900">{eventLabel(event.status)}</span>
+      {event.costLabel && <span class="rounded-full bg-secondary-100 px-3 py-1 text-secondary-900">{event.costLabel}</span>}
+      {countdown && featured && <span class="text-primary-700">{countdown}</span>}
+    </div>
+    <h3 class:list={['mt-5 font-display font-bold text-neutral-900', featured ? 'text-3xl' : 'text-xl']}>{event.title}</h3>
+    <dl class="mt-5 space-y-2 text-sm text-neutral-700">
+      <div><dt class="sr-only">Date</dt><dd>{formatEventDate(event)}</dd></div>
+      <div><dt class="sr-only">Time</dt><dd>{formatEventTime(event)} · Ghana time</dd></div>
+      <div><dt class="sr-only">Location</dt><dd>{event.locationName ?? event.locationArea ?? eventLabel(event.location)} · {eventLabel(event.format)}</dd></div>
+    </dl>
+    <p class="mt-4 flex-1 leading-relaxed text-neutral-600">{event.description}</p>
+    <div class="mt-7 flex flex-wrap gap-3">
+      <a href={`/events/${event.slug}`} class="inline-flex min-h-11 items-center justify-center rounded-lg border border-primary-200 px-5 py-3 font-semibold text-primary-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500">View Event</a>
+      {canPlan && event.format === 'ONLINE' && event.onlineUrl
+        ? <a href={event.onlineUrl} class="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary-700 px-5 py-3 font-semibold text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500">Join Online</a>
+        : canPlan && event.registrationStatus === 'OPEN' && event.registrationUrl
+        ? <a href={event.registrationUrl} class="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary-700 px-5 py-3 font-semibold text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500">Register</a>
+        : canPlan && <a href={`/plan-your-visit?event=${encodeURIComponent(event.slug)}`} class="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary-700 px-5 py-3 font-semibold text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500">{event.format === 'ONLINE' ? 'Plan to Join Online' : 'Plan to Attend'}</a>}
+    </div>
+  </div>
+</article>

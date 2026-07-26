@@ -1,567 +1,174 @@
 ---
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import NewsletterSignup from '../components/newsletter/NewsletterSignup.astro';
+import EventCard from '../components/events/EventCard.astro';
+import EventFilters from '../components/events/EventFilters.astro';
+import FeaturedProgrammeCard from '../components/events/FeaturedProgrammeCard.astro';
+import RecurringProgrammeCard from '../components/events/RecurringProgrammeCard.astro';
+import EventResponseModal from '../components/events/EventResponseModal.astro';
+import heroImage from '../assets/events-page-hero.png';
+import { featuredProgrammes, getPastEventHighlights, getUpcomingApprovedEvents, recurringProgrammes } from '../data/events';
 
-// Sample events data - in a real application, this would come from a CMS or database
-const upcomingEvents = [
-  {
-    id: 1,
-    title: "Christmas Celebration Service",
-    date: "2024-12-25",
-    time: "9:00 AM - 12:00 PM",
-    location: "Conference Hall, Royal Cockpit Hotel",
-    description: "Join us for a special Christmas service celebrating the birth of our Lord Jesus Christ. We'll have special music, testimonies, and a powerful message about God's greatest gift to humanity.",
-    category: "Special Service",
-    featured: true,
-    image: "https://images.pexels.com/photos/1303081/pexels-photo-1303081.jpeg?auto=compress&cs=tinysrgb&w=800"
-  },
-  {
-    id: 2,
-    title: "New Year Prayer & Fasting",
-    date: "2025-01-01",
-    time: "6:00 PM - 8:00 PM",
-    location: "Conference Hall, Royal Cockpit Hotel",
-    description: "Start the new year with prayer, worship, and seeking God's blessing for 2025. We'll pray for our families, church, community, and nation.",
-    category: "Prayer Meeting",
-    featured: true,
-    image: "https://images.pexels.com/photos/8468722/pexels-photo-8468722.jpeg?auto=compress&cs=tinysrgb&w=800"
-  },
-  {
-    id: 3,
-    title: "Youth Conference 2025",
-    date: "2025-01-15",
-    time: "4:00 PM - 8:00 PM",
-    location: "Conference Hall, Royal Cockpit Hotel",
-    description: "A special conference for young people featuring dynamic worship, inspiring messages, and fellowship. Theme: 'Called for Such a Time as This'",
-    category: "Youth Event",
-    featured: false,
-    image: "https://images.pexels.com/photos/7551659/pexels-photo-7551659.jpeg?auto=compress&cs=tinysrgb&w=800"
-  },
-  {
-    id: 4,
-    title: "Women's Fellowship Meeting",
-    date: "2025-01-18",
-    time: "10:00 AM - 12:00 PM",
-    location: "Conference Hall, Royal Cockpit Hotel",
-    description: "Monthly women's fellowship with Bible study, prayer, and encouraging one another in faith. All women are welcome!",
-    category: "Fellowship",
-    featured: false,
-    image: "https://images.pexels.com/photos/7551426/pexels-photo-7551426.jpeg?auto=compress&cs=tinysrgb&w=800"
-  },
-  {
-    id: 5,
-    title: "Community Outreach Program",
-    date: "2025-01-25",
-    time: "8:00 AM - 2:00 PM",
-    location: "Ahodwo-Nhyiaeso Community",
-    description: "Join us as we reach out to our community with food distribution, medical checkups, and sharing God's love through practical service.",
-    category: "Outreach",
-    featured: false,
-    image: "https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=800"
-  },
-  {
-    id: 6,
-    title: "Marriage Enrichment Seminar",
-    date: "2025-02-08",
-    time: "2:00 PM - 6:00 PM",
-    location: "Conference Hall, Royal Cockpit Hotel",
-    description: "A special seminar for married couples and those preparing for marriage. Learn biblical principles for strong, healthy relationships.",
-    category: "Seminar",
-    featured: false,
-    image: "https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&w=800"
-  }
-];
-
-const recurringEvents = [
-  {
-    title: "Sunday Worship Service",
-    day: "Every Sunday",
-    time: "9:00 AM - 11:30 AM",
-    description: "Join us for worship, prayer, and biblical teaching in a warm, welcoming environment.",
-    icon: "worship"
-  },
-  {
-    title: "Wednesday Bible Study",
-    day: "Every Wednesday",
-    time: "6:00 PM - 7:30 PM",
-    description: "Dive deeper into God's Word with interactive Bible study and discussion.",
-    icon: "bible"
-  },
-  {
-    title: "Friday Prayer Meeting",
-    day: "Every Friday",
-    time: "6:00 PM - 7:00 PM",
-    description: "Come together for corporate prayer, intercession, and seeking God's face.",
-    icon: "prayer"
-  },
-  {
-    title: "Saturday Youth Service",
-    day: "Every Saturday",
-    time: "4:00 PM - 6:00 PM",
-    description: "Dynamic worship and teaching specifically designed for young people.",
-    icon: "youth"
-  }
-];
-
-const eventCategories = [
-  { name: "All Events", value: "all", color: "primary" },
-  { name: "Special Service", value: "special-service", color: "secondary" },
-  { name: "Prayer Meeting", value: "prayer-meeting", color: "primary" },
-  { name: "Youth Event", value: "youth-event", color: "secondary" },
-  { name: "Fellowship", value: "fellowship", color: "primary" },
-  { name: "Outreach", value: "outreach", color: "secondary" },
-  { name: "Seminar", value: "seminar", color: "primary" }
-];
-
-// Helper function to format date
-function formatDate(dateString: string) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
-}
-
-// Helper function to get days until event
-function getDaysUntil(dateString: string) {
-  const eventDate = new Date(dateString);
-  const today = new Date();
-  const diffTime = eventDate.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays;
-}
+const upcomingEvents = getUpcomingApprovedEvents();
+const pastHighlights = getPastEventHighlights();
+const activeProgrammes = recurringProgrammes.filter((programme) => programme.approved && programme.status === 'ACTIVE');
+const programmeCadences = ['WEEKLY', 'MONTHLY', 'QUARTERLY'] as const;
 ---
 
-<Layout 
-  title="Events & Programs | Omet Omeni Ministries - Join Our Community Activities" 
-  description="Discover upcoming events, services, and programs at Omet Omeni Ministries in Kumasi, Ghana. Join us for worship, fellowship, youth activities, and community outreach."
->
+<Layout title="Events and Ministry Experiences | Omet Omeni Ministries" description="Discover upcoming Omet Omeni Ministries programmes in Accra, Kumasi and online, including biblical teaching, prayer, worship, discipleship, leadership and special ministry events.">
   <Header />
-  
-  <!-- Hero Section -->
-  <section class="relative bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center">
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-neutral-900 mb-6">
-          Events & <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-secondary-600">Programs</span>
-        </h1>
-        <p class="text-xl text-neutral-600 max-w-3xl mx-auto mb-8">
-          Join us for worship, fellowship, and community activities. There's always something happening at Omet Omeni Ministries!
-        </p>
-        
-        <!-- Quick Service Times -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
-          <div class="bg-white p-4 rounded-lg shadow-md border border-neutral-100">
-            <div class="text-primary-600 font-semibold text-sm">SUNDAY</div>
-            <div class="text-neutral-900 font-medium">9:00 AM</div>
-            <div class="text-neutral-600 text-sm">Worship Service</div>
-          </div>
-          <div class="bg-white p-4 rounded-lg shadow-md border border-neutral-100">
-            <div class="text-secondary-600 font-semibold text-sm">WEDNESDAY</div>
-            <div class="text-neutral-900 font-medium">6:00 PM</div>
-            <div class="text-neutral-600 text-sm">Bible Study</div>
-          </div>
-          <div class="bg-white p-4 rounded-lg shadow-md border border-neutral-100">
-            <div class="text-primary-600 font-semibold text-sm">FRIDAY</div>
-            <div class="text-neutral-900 font-medium">6:00 PM</div>
-            <div class="text-neutral-600 text-sm">Prayer Meeting</div>
-          </div>
-          <div class="bg-white p-4 rounded-lg shadow-md border border-neutral-100">
-            <div class="text-secondary-600 font-semibold text-sm">SATURDAY</div>
-            <div class="text-neutral-900 font-medium">4:00 PM</div>
-            <div class="text-neutral-600 text-sm">Youth Service</div>
-          </div>
+  <main id="main-content">
+    <section class="relative isolate overflow-hidden bg-neutral-950 text-white">
+      <div class="absolute inset-0 -z-10" aria-hidden="true"><Image src={heroImage} alt="" format="webp" quality={80} loading="eager" class="h-full w-full object-cover object-center" /><div class="absolute inset-0 bg-gradient-to-r from-neutral-950/95 via-primary-900/80 to-neutral-950/30"></div></div>
+      <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+        <div class="max-w-4xl">
+          <p class="text-sm font-semibold uppercase tracking-[0.2em] text-secondary-300">Gather, grow and connect</p>
+          <h1 class="mt-4 text-4xl font-display font-bold sm:text-5xl lg:text-6xl">Events and Ministry Experiences</h1>
+          <p class="mt-6 max-w-3xl text-lg leading-relaxed text-primary-50 sm:text-xl">Join Omet Omeni Ministries through biblical teaching, prayer, worship, discipleship and special programmes in Accra, Kumasi and online.</p>
+          <div class="mt-8 flex flex-col gap-4 sm:flex-row"><a href="#upcoming-events" class="inline-flex min-h-12 items-center justify-center rounded-lg bg-secondary-300 px-6 py-3 font-semibold text-neutral-900 hover:bg-secondary-200">View Upcoming Events</a><a href="/plan-your-visit" class="inline-flex min-h-12 items-center justify-center rounded-lg border border-white/50 px-6 py-3 font-semibold text-white hover:bg-white/10">Plan Your Visit</a></div>
+        </div>
+        <div class="mt-12 grid max-w-3xl grid-cols-3 gap-3">
+          {['Accra', 'Kumasi', 'Online'].map((location) => <a href={`#upcoming-events`} data-hero-location={location.toUpperCase()} class="rounded-xl border border-white/20 bg-white/10 p-4 text-center font-semibold backdrop-blur-sm hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-white">{location}</a>)}
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Featured Events -->
-  <section class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
-          Featured Events
-        </h2>
-        <p class="text-xl text-neutral-600">
-          Don't miss these special upcoming events at Omet Omeni Ministries
-        </p>
-      </div>
-      
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {upcomingEvents.filter(event => event.featured).map((event) => (
-          <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 border border-neutral-100">
-            <div class="relative h-64">
-              <img 
-                src={event.image} 
-                alt={event.title}
-                class="w-full h-full object-cover"
-              />
-              <div class="absolute top-4 left-4">
-                <span class="bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  {event.category}
-                </span>
-              </div>
-              <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-2 text-center">
-                <div class="text-primary-600 font-bold text-lg">
-                  {new Date(event.date).getDate()}
-                </div>
-                <div class="text-neutral-600 text-xs uppercase">
-                  {new Date(event.date).toLocaleDateString('en-US', { month: 'short' })}
-                </div>
-              </div>
-            </div>
-            
-            <div class="p-8">
-              <div class="flex items-center text-sm text-neutral-500 mb-3">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                {formatDate(event.date)}
-              </div>
-              
-              <h3 class="text-2xl font-bold text-neutral-900 mb-3">{event.title}</h3>
-              
-              <div class="space-y-2 mb-4">
-                <div class="flex items-center text-neutral-600">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  {event.time}
-                </div>
-                <div class="flex items-start text-neutral-600">
-                  <svg class="w-4 h-4 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  </svg>
-                  {event.location}
-                </div>
-              </div>
-              
-              <p class="text-neutral-600 mb-6 leading-relaxed">{event.description}</p>
-              
-              <div class="flex items-center justify-between">
-                <div class="text-sm">
-                  {getDaysUntil(event.date) > 0 ? (
-                    <span class="text-primary-600 font-medium">
-                      {getDaysUntil(event.date)} days to go
-                    </span>
-                  ) : getDaysUntil(event.date) === 0 ? (
-                    <span class="text-secondary-600 font-medium">Today!</span>
-                  ) : (
-                    <span class="text-neutral-500">Past event</span>
-                  )}
-                </div>
-                <button class="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors font-medium">
-                  Learn More
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Event Categories Filter -->
-  <section class="py-20 bg-neutral-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
-          All Upcoming Events
-        </h2>
-        <p class="text-xl text-neutral-600 mb-8">
-          Filter events by category to find what interests you most
-        </p>
-        
-        <!-- Category Filter -->
-        <div class="flex flex-wrap justify-center gap-3 mb-12">
-          {eventCategories.map((category) => (
-            <button 
-              class={`px-4 py-2 rounded-full text-sm font-medium transition-colors filter-btn ${
-                category.color === 'primary' 
-                  ? 'bg-primary-100 text-primary-700 hover:bg-primary-200' 
-                  : 'bg-secondary-100 text-secondary-700 hover:bg-secondary-200'
-              }`}
-              data-category={category.value}
-            >
-              {category.name}
-            </button>
-          ))}
+    <section class="bg-white py-20" aria-labelledby="featured-heading">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <p class="text-sm font-semibold uppercase tracking-wider text-primary-700">Ministry highlights</p>
+        <h2 id="featured-heading" class="mt-3 text-3xl font-display font-bold text-neutral-900 sm:text-4xl">Featured Events</h2>
+        <p class="mt-4 max-w-3xl text-lg text-neutral-600">Explore these upcoming ministry gatherings. Dates, venues and access details will be shared when confirmed.</p>
+        <div class="mt-10 grid items-stretch gap-8 md:grid-cols-2">
+          {featuredProgrammes.map((programme) => <FeaturedProgrammeCard programme={programme} />)}
         </div>
       </div>
-      
-      <!-- Events Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="events-grid">
-        {upcomingEvents.map((event) => (
-          <div 
-            class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 event-card"
-            data-category={event.category.toLowerCase().replace(/\s+/g, '-')}
-          >
-            <div class="relative h-48">
-              <img 
-                src={event.image} 
-                alt={event.title}
-                class="w-full h-full object-cover"
-              />
-              <div class="absolute top-3 left-3">
-                <span class="bg-white/90 backdrop-blur-sm text-neutral-800 px-2 py-1 rounded-full text-xs font-medium">
-                  {event.category}
-                </span>
-              </div>
-              <div class="absolute top-3 right-3 bg-primary-600 text-white rounded-lg p-2 text-center">
-                <div class="font-bold text-sm">
-                  {new Date(event.date).getDate()}
-                </div>
-                <div class="text-xs">
-                  {new Date(event.date).toLocaleDateString('en-US', { month: 'short' })}
-                </div>
-              </div>
-            </div>
-            
-            <div class="p-6">
-              <h3 class="text-lg font-semibold text-neutral-900 mb-2">{event.title}</h3>
-              
-              <div class="space-y-1 mb-3 text-sm text-neutral-600">
-                <div class="flex items-center">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                  {formatDate(event.date)}
-                </div>
-                <div class="flex items-center">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  {event.time}
-                </div>
-              </div>
-              
-              <p class="text-neutral-600 text-sm mb-4 line-clamp-3">{event.description}</p>
-              
-              <div class="flex items-center justify-between">
-                <div class="text-xs">
-                  {getDaysUntil(event.date) > 0 ? (
-                    <span class="text-primary-600 font-medium">
-                      In {getDaysUntil(event.date)} days
-                    </span>
-                  ) : getDaysUntil(event.date) === 0 ? (
-                    <span class="text-secondary-600 font-medium">Today!</span>
-                  ) : (
-                    <span class="text-neutral-500">Past</span>
-                  )}
-                </div>
-                <button class="text-primary-600 hover:text-primary-700 font-medium text-sm">
-                  Details →
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Regular Schedule -->
-  <section class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
-          Regular Schedule
-        </h2>
-        <p class="text-xl text-neutral-600">
-          Join us every week for these regular services and activities
-        </p>
+    <section id="upcoming-events" class="scroll-mt-24 bg-primary-50/50 py-20" aria-labelledby="upcoming-heading">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl"><p class="text-sm font-semibold uppercase tracking-wider text-primary-700">Find your next step</p><h2 id="upcoming-heading" class="mt-3 text-3xl font-display font-bold text-neutral-900 sm:text-4xl">Upcoming Events</h2><p class="mt-4 text-lg text-neutral-600">Filter confirmed programmes by location, format, category or month.</p></div>
+        <div class="mt-10"><EventFilters /></div>
+        <div id="events-grid" class="mt-10 grid items-stretch gap-7 md:grid-cols-2 lg:grid-cols-3" hidden={upcomingEvents.length === 0}>
+          {upcomingEvents.map((event) => <EventCard event={event} />)}
+        </div>
+        {upcomingEvents.length === 0 && <div id="upcoming-default-state" class="mt-10 rounded-2xl border border-primary-100 bg-white p-10 text-center"><h3 class="text-2xl font-semibold text-neutral-900">No additional upcoming events are currently published</h3><p class="mx-auto mt-3 max-w-2xl text-neutral-600">Use the filters to find matching Featured Events above, or subscribe while further programme details are being prepared.</p><a href="/sermons" class="mt-6 inline-flex font-semibold text-primary-800 underline underline-offset-4">Explore sermons</a></div>}
+        <div id="events-empty-state" hidden class="mt-10 rounded-xl border border-neutral-200 bg-white p-8 text-center text-neutral-700" role="status">No upcoming events match these filters.</div>
       </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {recurringEvents.map((event) => (
-          <div class="bg-gradient-to-br from-neutral-50 to-white p-8 rounded-2xl border border-neutral-100 hover:shadow-lg transition-shadow duration-300">
-            <div class="text-center">
-              <div class="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center">
-                {event.icon === 'worship' && (
-                  <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
-                  </svg>
-                )}
-                {event.icon === 'bible' && (
-                  <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                  </svg>
-                )}
-                {event.icon === 'prayer' && (
-                  <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                  </svg>
-                )}
-                {event.icon === 'youth' && (
-                  <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                  </svg>
-                )}
+    </section>
+
+    <section class="bg-white py-20" aria-labelledby="regular-heading">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl"><p class="text-sm font-semibold uppercase tracking-wider text-primary-700">Ongoing formation</p><h2 id="regular-heading" class="mt-3 text-3xl font-display font-bold text-neutral-900 sm:text-4xl">Regular Ministry Programmes</h2></div>
+        {activeProgrammes.length > 0
+          ? <>
+              <div class="mt-8 flex flex-wrap gap-3" role="group" aria-label="Filter regular ministry programmes">
+                {programmeCadences.map((cadence) => <button
+                  type="button"
+                  data-programme-filter={cadence}
+                  aria-pressed="false"
+                  class="min-h-11 rounded-full border border-primary-200 bg-white px-5 py-2 font-semibold text-primary-800 transition hover:border-primary-500 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 aria-pressed:border-primary-700 aria-pressed:bg-primary-700 aria-pressed:text-white"
+                >{cadence.charAt(0) + cadence.slice(1).toLowerCase()}</button>)}
               </div>
-              
-              <h3 class="text-xl font-semibold text-neutral-900 mb-2">{event.title}</h3>
-              <div class="text-primary-600 font-medium mb-1">{event.day}</div>
-              <div class="text-neutral-600 font-medium mb-3">{event.time}</div>
-              <p class="text-neutral-600 text-sm leading-relaxed">{event.description}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Event Calendar Section -->
-  <section class="py-20 bg-gradient-to-br from-primary-50 to-secondary-50">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <div class="space-y-8">
-        <div>
-          <h2 class="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
-            Stay Updated
-          </h2>
-          <p class="text-xl text-neutral-600">
-            Never miss an event! Subscribe to our calendar and get notifications about upcoming activities.
-          </p>
-        </div>
-        
-        <div class="bg-white rounded-2xl p-8 shadow-lg">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div class="text-left">
-              <h3 class="text-2xl font-semibold text-neutral-900 mb-4">Get Event Notifications</h3>
-              <ul class="space-y-3 text-neutral-600">
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-primary-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                  Weekly service reminders
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-primary-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                  Special event announcements
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-primary-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                  Ministry updates
-                </li>
-              </ul>
-            </div>
-            
-            <div>
-              <NewsletterSignup source="EVENTS" title="Event notifications" description="Subscribe for relevant programmes and ministry updates." defaultInterests={['EVENTS', 'GENERAL_UPDATES']} compact />
-              
-              <div class="mt-6 flex justify-center space-x-4">
-                <a href="#" class="text-primary-600 hover:text-primary-700 font-medium text-sm">
-                  Add to Google Calendar
-                </a>
-                <span class="text-neutral-300">|</span>
-                <a href="#" class="text-primary-600 hover:text-primary-700 font-medium text-sm">
-                  Download iCal
-                </a>
+              <p id="programme-filter-status" class="mt-4 text-sm font-medium text-neutral-600" role="status" aria-live="polite">Showing all regular programmes.</p>
+              <div id="programme-grid" class="mt-8 grid items-stretch gap-7 md:grid-cols-2 lg:grid-cols-3">
+                {activeProgrammes.map((programme) => <div class="h-full" data-programme-card data-cadence={programme.cadence}><RecurringProgrammeCard programme={programme} /></div>)}
               </div>
-            </div>
-          </div>
-        </div>
+            </>
+          : <div class="mt-10 rounded-2xl border border-neutral-200 bg-neutral-50 p-8"><h3 class="text-xl font-semibold text-neutral-900">Regular ministry programmes are being finalised.</h3><p class="mt-3 text-neutral-600">Subscribe for updates or view confirmed upcoming events.</p></div>}
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Contact for Events -->
-  <section class="py-20 bg-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <div class="space-y-8">
-        <div>
-          <h2 class="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
-            Questions About Our Events?
-          </h2>
-          <p class="text-xl text-neutral-600">
-            We're here to help! Contact us for more information about any of our events or programs.
-          </p>
-        </div>
-        
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a 
-            href="/contact" 
-            class="inline-flex items-center justify-center px-8 py-4 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            Contact Us
-            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-            </svg>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
+    {pastHighlights.length > 0 && <section class="bg-neutral-950 py-20 text-white" aria-labelledby="highlights-heading"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><h2 id="highlights-heading" class="text-3xl font-display font-bold sm:text-4xl">Past Event Highlights and Recordings</h2><div class="mt-10 grid gap-6 md:grid-cols-3">{pastHighlights.map((event) => <article class="rounded-xl border border-white/15 bg-white/5 p-6"><h3 class="text-xl font-semibold">{event.title}</h3><div class="mt-5 flex flex-wrap gap-4">{event.recordingUrl && <a href={event.recordingUrl}>Watch Recording</a>}{event.sermonUrl && <a href={event.sermonUrl}>View Sermon</a>}{event.recapUrl && <a href={event.recapUrl}>Read Event Recap</a>}</div></article>)}</div></div></section>}
 
+    <section class="bg-gradient-to-br from-primary-900 to-neutral-950 py-20 text-white" aria-labelledby="updates-heading"><div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8"><div class="rounded-2xl border border-white/15 bg-white/10 p-7 backdrop-blur-sm sm:p-10"><NewsletterSignup source="EVENTS" title="Stay Updated" description="Receive selected event announcements, prayer programmes and ministry updates from Omet Omeni Ministries." defaultInterests={['EVENTS', 'GENERAL_UPDATES']} dark /></div></div></section>
+
+    <section class="bg-secondary-50 py-20" aria-labelledby="event-help-heading"><div class="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8"><h2 id="event-help-heading" class="text-3xl font-display font-bold text-neutral-900 sm:text-4xl">Need Help Planning Your Visit?</h2><p class="mx-auto mt-5 max-w-2xl text-lg text-neutral-700">Our team can help you choose an event, request an appointment or connect online in Accra, Kumasi or through our digital ministry.</p><div class="mt-8 flex flex-col justify-center gap-4 sm:flex-row"><a href="/plan-your-visit" class="rounded-lg bg-primary-800 px-6 py-3 font-semibold text-white">Plan Your Visit</a><a href="/contact" class="rounded-lg border border-primary-200 bg-white px-6 py-3 font-semibold text-primary-800">Contact the Ministry</a><a href="/sermons" class="px-6 py-3 font-semibold text-primary-800 underline">View Sermons</a></div></div></section>
+    <EventResponseModal />
+  </main>
   <Footer />
 </Layout>
 
 <script>
-  // Event filtering functionality
-  document.addEventListener('DOMContentLoaded', function() {
-    const filterButtons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
-    const eventCards = document.querySelectorAll<HTMLElement>('.event-card');
-    
-    filterButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const category = button.dataset.category;
-        
-        // Update active button
-        filterButtons.forEach(btn => {
-          btn.classList.remove('bg-primary-600', 'text-white', 'bg-secondary-600');
-          if (btn.classList.contains('bg-primary-100')) {
-            btn.classList.add('bg-primary-100', 'text-primary-700');
-          } else {
-            btn.classList.add('bg-secondary-100', 'text-secondary-700');
-          }
-        });
-        
-        if (button.classList.contains('bg-primary-100')) {
-          button.classList.remove('bg-primary-100', 'text-primary-700');
-          button.classList.add('bg-primary-600', 'text-white');
-        } else {
-          button.classList.remove('bg-secondary-100', 'text-secondary-700');
-          button.classList.add('bg-secondary-600', 'text-white');
-        }
-        
-        // Filter events
-        eventCards.forEach(card => {
-          if (category === 'all' || card.getAttribute('data-category') === category) {
-            card.style.display = 'block';
-            card.classList.add('animate-fade-in');
-          } else {
-            card.style.display = 'none';
-          }
-        });
+  const filters = document.querySelector<HTMLFormElement>('#event-filters');
+  if (filters) {
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-event-card]'));
+    const featuredCards = cards.filter((card) => card.hasAttribute('data-featured-event'));
+    const featuredHomes = new Map(featuredCards.map((card) => {
+      const marker = document.createComment('featured-event-home');
+      card.before(marker);
+      return [card, marker] as const;
+    }));
+    const grid = document.querySelector<HTMLElement>('#events-grid');
+    const count = document.querySelector<HTMLElement>('#event-result-count');
+    const empty = document.querySelector<HTMLElement>('#events-empty-state');
+    const defaultState = document.querySelector<HTMLElement>('#upcoming-default-state');
+    const applyFilters = () => {
+      const data = new FormData(filters);
+      const values = { location: String(data.get('location') || ''), format: String(data.get('format') || ''), category: String(data.get('category') || ''), month: String(data.get('month') || '') };
+      const filtering = Object.values(values).some(Boolean);
+      let visible = 0;
+      cards.forEach((card) => {
+        const locations = (card.dataset.location ?? '').split(' ');
+        const match = (!values.location || locations.includes(values.location)) && (!values.format || card.dataset.format === values.format) && (!values.category || card.dataset.category === values.category) && (!values.month || card.dataset.month === values.month);
+        card.hidden = filtering && !match;
+        if (match) visible += 1;
       });
-    });
-    
-  });
+      featuredCards.forEach((card) => {
+        const marker = featuredHomes.get(card);
+        if (!marker?.parentNode) return;
+        if (filtering && !card.hidden && grid) {
+          grid.append(card);
+        } else if (card.previousSibling !== marker) {
+          marker.parentNode.insertBefore(card, marker.nextSibling);
+        }
+      });
+      const resultHasCards = filtering && visible > 0;
+      if (grid) grid.hidden = !resultHasCards && grid.querySelectorAll('[data-featured-event]').length === grid.children.length;
+      if (defaultState) defaultState.hidden = filtering;
+      if (count) count.textContent = `${visible} ${visible === 1 ? 'event' : 'events'} found across Featured and Upcoming Events`;
+      if (empty) empty.hidden = !filtering || visible !== 0;
+      const query = new URLSearchParams(Object.entries(values).filter(([, value]) => value));
+      history.replaceState(null, '', `${location.pathname}${query.size ? `?${query}` : ''}${location.hash}`);
+    };
+    const initial = new URLSearchParams(location.search);
+    filters.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select').forEach((control) => { const value = initial.get(control.name); if (value) control.value = value; });
+    filters.addEventListener('change', applyFilters);
+    filters.addEventListener('reset', () => requestAnimationFrame(applyFilters));
+    document.querySelectorAll<HTMLElement>('[data-hero-location]').forEach((link) => link.addEventListener('click', () => {
+      const select = filters.querySelector<HTMLSelectElement>('[name="location"]'); if (select) select.value = link.dataset.heroLocation ?? ''; applyFilters();
+    }));
+    applyFilters();
+  }
 </script>
 
-<style>
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-in-out;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-</style>
+<script>
+  const programmeButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-programme-filter]'));
+  const programmeCards = Array.from(document.querySelectorAll<HTMLElement>('[data-programme-card]'));
+  const programmeStatus = document.querySelector<HTMLElement>('#programme-filter-status');
+  let activeCadence = '';
+
+  const applyProgrammeFilter = () => {
+    programmeCards.forEach((card) => {
+      card.hidden = Boolean(activeCadence) && card.dataset.cadence !== activeCadence;
+    });
+    programmeButtons.forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.programmeFilter === activeCadence));
+    });
+    if (programmeStatus) {
+      programmeStatus.textContent = activeCadence
+        ? `Showing ${activeCadence.toLowerCase()} programmes.`
+        : 'Showing all regular programmes.';
+    }
+  };
+
+  programmeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const selected = button.dataset.programmeFilter ?? '';
+      activeCadence = activeCadence === selected ? '' : selected;
+      applyProgrammeFilter();
+    });
+  });
+</script>

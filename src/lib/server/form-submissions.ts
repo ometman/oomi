@@ -1,6 +1,6 @@
 import { validateVisitRequest, type PlanVisitSubmission, type VisitType } from '../visit-request';
 
-export type SubmissionKind = 'contact' | 'ministry-interest' | 'visit-request';
+export type SubmissionKind = 'contact' | 'ministry-interest' | 'visit-request' | 'event-response';
 
 export interface PreparedSubmission {
   subject: string;
@@ -84,6 +84,41 @@ function prepareMinistryInterest(input: Record<string, unknown>): PreparationRes
   };
 }
 
+function prepareEventResponse(input: Record<string, unknown>): PreparationResult {
+  const fullName = text(input.fullName, 160);
+  const email = text(input.email, 254);
+  const phone = text(input.phone, 40);
+  const programme = text(input.programme, 180);
+  const action = text(input.action, 20);
+  const message = text(input.message, 1500);
+  const allowedActions = ['REGISTER', 'PLAN', 'JOIN'];
+  const errors: Record<string, string> = {};
+  if (!fullName) errors.fullName = 'Enter your full name.';
+  if (!emailPattern.test(email)) errors.email = 'Enter a valid email address.';
+  if (!programme) errors.programme = 'Choose a valid programme.';
+  if (!allowedActions.includes(action)) errors.action = 'Choose a valid response.';
+  if (!checked(input.contactConsent)) errors.contactConsent = 'Consent to respond is required.';
+  if (Object.keys(errors).length) return { valid: false, errors };
+
+  const actionLabels: Record<string, string> = {
+    REGISTER: 'Register to attend',
+    PLAN: 'Plan to attend',
+    JOIN: 'I will be joining the service',
+  };
+  return {
+    valid: true,
+    errors,
+    submission: {
+      subject: `[Programme Response] ${actionLabels[action]} — ${programme}`,
+      replyTo: email,
+      text: lines([
+        ['Response', actionLabels[action]], ['Programme', programme], ['Full name', fullName],
+        ['Email', email], ['Phone', phone], ['Message', message], ['Contact consent', 'Yes'],
+      ]),
+    },
+  };
+}
+
 const visitSubjects: Record<VisitType, string> = {
   IN_PERSON_EVENT: '[Plan Your Visit] New visit request',
   ONLINE_EVENT: '[Plan Your Visit] New online visit request',
@@ -125,5 +160,6 @@ export function prepareSubmission(kind: unknown, input: Record<string, unknown>)
   if (kind === 'contact') return prepareContact(input);
   if (kind === 'ministry-interest') return prepareMinistryInterest(input);
   if (kind === 'visit-request') return prepareVisit(input);
+  if (kind === 'event-response') return prepareEventResponse(input);
   return { valid: false, errors: { kind: 'Unsupported form type.' } };
 }

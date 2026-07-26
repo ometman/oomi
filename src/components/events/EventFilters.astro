@@ -1,0 +1,20 @@
+---
+import { eventLabel } from '../../lib/events';
+
+const locations = ['ACCRA', 'KUMASI', 'ONLINE'];
+const formats = ['IN_PERSON', 'ONLINE', 'HYBRID'];
+const categories = ['TEACHING', 'PRAYER_WORSHIP', 'DISCIPLESHIP', 'LEADERSHIP', 'CONFERENCE', 'OUTREACH', 'YOUTH_FAMILY', 'ONLINE_PROGRAMME', 'SPECIAL_MINISTRY'];
+---
+
+<form id="event-filters" class="rounded-2xl border border-primary-100 bg-white p-6 shadow-sm" aria-label="Filter upcoming events">
+  <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+    <label class="text-sm font-semibold text-neutral-800">Location<select name="location" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500"><option value="">All locations</option>{locations.map((value) => <option value={value}>{eventLabel(value)}</option>)}</select></label>
+    <label class="text-sm font-semibold text-neutral-800">Format<select name="format" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500"><option value="">All formats</option>{formats.map((value) => <option value={value}>{eventLabel(value)}</option>)}</select></label>
+    <label class="text-sm font-semibold text-neutral-800">Category<select name="category" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500"><option value="">All categories</option>{categories.map((value) => <option value={value}>{eventLabel(value)}</option>)}</select></label>
+    <label class="text-sm font-semibold text-neutral-800">Month<input name="month" type="month" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500" /></label>
+  </div>
+  <div class="mt-5 flex flex-wrap items-center justify-between gap-4">
+    <p id="event-result-count" class="text-sm font-medium text-neutral-700" role="status" aria-live="polite"></p>
+    <button type="reset" class="min-h-11 rounded-lg border border-primary-200 px-5 py-2 font-semibold text-primary-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500">Clear Filters</button>
+  </div>
+</form>

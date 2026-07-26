@@ -1,0 +1,46 @@
+---
+import type { RecurringProgramme } from '../../data/events';
+import { eventLabel } from '../../lib/events';
+
+interface Props {
+  programme: RecurringProgramme;
+}
+
+const { programme } = Astro.props;
+---
+
+<article class="flex h-full flex-col overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-[0_18px_50px_-36px_rgba(30,58,138,0.55)]">
+  <div class="relative flex h-48 items-center justify-center overflow-hidden bg-gradient-to-br from-primary-950 via-primary-800 to-secondary-500">
+    {programme.image
+      ? <img src={programme.image} alt="" loading="lazy" width="640" height="400" class="absolute inset-0 h-full w-full object-cover" />
+      : <div class="relative text-center text-white">
+          <svg aria-hidden="true" class="mx-auto h-10 w-10 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Z" />
+          </svg>
+          <p class="mt-2 text-xs font-semibold uppercase tracking-[0.18em]">Programme image</p>
+        </div>}
+    <div class="absolute inset-0 bg-gradient-to-t from-neutral-950/35 to-transparent"></div>
+  </div>
+  <div class="flex flex-1 flex-col p-6">
+    <div class="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wider">
+      <span class="rounded-full bg-primary-100 px-3 py-1 text-primary-900">{programme.recurrenceLabel}</span>
+      <span class="rounded-full bg-secondary-100 px-3 py-1 text-secondary-900">{programme.formatLabel ?? eventLabel(programme.format)}</span>
+    </div>
+    <h4 class="mt-5 text-xl font-display font-bold text-neutral-900">{programme.title}</h4>
+    <p class="mt-4 flex-1 leading-relaxed text-neutral-600">{programme.description}</p>
+    {(programme.time || programme.location) && <p class="mt-5 text-sm font-medium text-neutral-700">
+      {[programme.time, programme.location && eventLabel(programme.location)].filter(Boolean).join(' · ')}
+    </p>}
+    <div class="mt-6 flex justify-end">
+      <button
+        type="button"
+        data-event-response
+        data-action="JOIN"
+        data-programme={programme.title}
+        data-meta={`${programme.recurrenceLabel} · ${programme.formatLabel ?? eventLabel(programme.format)}`}
+        data-description={programme.description}
+        class="inline-flex min-h-11 items-center font-semibold text-primary-800 underline underline-offset-4 hover:text-primary-950 focus:outline-none focus:ring-2 focus:ring-primary-500"
+      >View details</button>
+    </div>
+  </div>
+</article>

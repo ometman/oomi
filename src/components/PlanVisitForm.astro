@@ -85,7 +85,7 @@ const endpoint = '/api/forms';
             <label for="eventId" class="block text-sm font-medium text-neutral-800">Programme</label>
             <select id="eventId" name="eventId" class="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
               <option value="">Choose a confirmed programme when available</option>
-              {events.map((event) => <option value={event.id}>{event.title}</option>)}
+              {events.map((event) => <option value={event.slug} data-location={event.location} data-format={event.format}>{event.title}</option>)}
             </select>
             {events.length === 0 && <p class="mt-2 text-sm text-neutral-600">No approved upcoming programmes are currently published. You may continue and our team can share an appropriate next step.</p>}
           </div>
@@ -325,6 +325,22 @@ const endpoint = '/api/forms';
       const eventSelect = form.querySelector<HTMLSelectElement>('#eventId'); if (eventSelect) eventSelect.value = button.dataset.eventId ?? '';
       updateConditions(); showStep(2); document.querySelector('#plan-form')?.scrollIntoView({ behavior: 'smooth' });
     }));
+    const requestedEvent = new URLSearchParams(window.location.search).get('event');
+    if (requestedEvent) {
+      const eventSelect = form.querySelector<HTMLSelectElement>('#eventId');
+      const eventOption = eventSelect ? Array.from(eventSelect.options).find((option) => option.value === requestedEvent) : undefined;
+      if (eventSelect && eventOption) {
+        eventSelect.value = requestedEvent;
+        const format = eventOption.dataset.format;
+        const location = eventOption.dataset.location;
+        const type = format === 'ONLINE' ? 'ONLINE_EVENT' : format === 'HYBRID' ? undefined : 'IN_PERSON_EVENT';
+        const typeOption = type ? form.querySelector<HTMLInputElement>(`input[name="visitType"][value="${type}"]`) : null;
+        const locationOption = location ? form.querySelector<HTMLInputElement>(`input[name="location"][value="${location}"]`) : null;
+        if (typeOption) typeOption.checked = true;
+        if (locationOption && format !== 'HYBRID') locationOption.checked = true;
+        updateConditions();
+      }
+    }
     next.addEventListener('click', () => { if (validateCurrentStep()) showStep(currentStep + 1); });
     previous.addEventListener('click', () => showStep(currentStep - 1));
 

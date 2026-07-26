@@ -1,0 +1,135 @@
+<dialog id="event-response-modal" class="m-auto w-[min(42rem,calc(100%-2rem))] rounded-2xl p-0 shadow-2xl backdrop:bg-neutral-950/70">
+  <div class="max-h-[90vh] overflow-y-auto bg-white">
+    <div class="flex items-start justify-between gap-5 border-b border-neutral-200 p-6">
+      <div>
+        <p id="event-modal-kicker" class="text-sm font-semibold uppercase tracking-wider text-primary-700">Programme response</p>
+        <h2 id="event-modal-title" class="mt-2 text-2xl font-display font-bold text-neutral-900">Programme details</h2>
+      </div>
+      <button type="button" data-modal-close class="rounded-lg p-2 text-neutral-600 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500">
+        <span class="sr-only">Close programme modal</span>
+        <svg aria-hidden="true" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18" /></svg>
+      </button>
+    </div>
+
+    <div class="p-6">
+      <div id="event-modal-details" class="rounded-xl bg-primary-50 p-5">
+        <p id="event-modal-meta" class="text-sm font-semibold text-primary-800"></p>
+        <p id="event-modal-description" class="mt-3 leading-relaxed text-neutral-700"></p>
+      </div>
+
+      <form id="event-response-form" class="mt-7 space-y-5" novalidate>
+        <input type="hidden" name="kind" value="event-response" />
+        <input type="hidden" name="programme" />
+        <input type="hidden" name="action" />
+        <div class="hidden" aria-hidden="true"><label>Company<input name="company" tabindex="-1" autocomplete="off" /></label></div>
+        <div>
+          <label for="event-full-name" class="block text-sm font-semibold text-neutral-800">Full name *</label>
+          <input id="event-full-name" name="fullName" required maxlength="160" autocomplete="name" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+          <p class="mt-1 text-sm text-red-700" data-error-for="fullName"></p>
+        </div>
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label for="event-email" class="block text-sm font-semibold text-neutral-800">Email address *</label>
+            <input id="event-email" name="email" type="email" required maxlength="254" autocomplete="email" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+            <p class="mt-1 text-sm text-red-700" data-error-for="email"></p>
+          </div>
+          <div>
+            <label for="event-phone" class="block text-sm font-semibold text-neutral-800">Phone number</label>
+            <input id="event-phone" name="phone" type="tel" maxlength="40" autocomplete="tel" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+          </div>
+        </div>
+        <div>
+          <label for="event-message" class="block text-sm font-semibold text-neutral-800">Additional information</label>
+          <textarea id="event-message" name="message" rows="3" maxlength="1500" class="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"></textarea>
+        </div>
+        <label class="flex items-start gap-3 text-sm text-neutral-700">
+          <input name="contactConsent" type="checkbox" required class="mt-1 h-4 w-4 rounded border-neutral-300 text-primary-700 focus:ring-primary-500" />
+          <span>I consent to Omet Omeni Ministries using these details to respond to this programme request. *</span>
+        </label>
+        <p class="text-sm text-red-700" data-error-for="contactConsent"></p>
+        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p id="event-form-status" class="text-sm font-medium" role="status" aria-live="polite"></p>
+          <button id="event-submit-button" type="submit" class="inline-flex min-h-12 items-center justify-center rounded-lg bg-primary-700 px-6 py-3 font-semibold text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-60">Send response</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const modal = document.querySelector<HTMLDialogElement>('#event-response-modal');
+  const form = document.querySelector<HTMLFormElement>('#event-response-form');
+  const title = document.querySelector<HTMLElement>('#event-modal-title');
+  const kicker = document.querySelector<HTMLElement>('#event-modal-kicker');
+  const meta = document.querySelector<HTMLElement>('#event-modal-meta');
+  const description = document.querySelector<HTMLElement>('#event-modal-description');
+  const status = document.querySelector<HTMLElement>('#event-form-status');
+  const submit = document.querySelector<HTMLButtonElement>('#event-submit-button');
+  let opener: HTMLElement | null = null;
+
+  const actionLabels: Record<string, string> = {
+    REGISTER: 'Register to Attend',
+    PLAN: 'Plan to Attend',
+    JOIN: 'I will be joining the service',
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-event-response]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!modal || !form) return;
+      opener = button;
+      const action = button.dataset.action ?? 'PLAN';
+      const programme = button.dataset.programme ?? '';
+      form.reset();
+      form.querySelector<HTMLInputElement>('[name="programme"]')!.value = programme;
+      form.querySelector<HTMLInputElement>('[name="action"]')!.value = action;
+      if (title) title.textContent = programme;
+      if (kicker) kicker.textContent = action === 'JOIN' ? 'Regular programme details' : 'Featured event response';
+      if (meta) meta.textContent = button.dataset.meta ?? '';
+      if (description) description.textContent = button.dataset.description ?? '';
+      if (submit) submit.textContent = actionLabels[action] ?? 'Send response';
+      if (status) { status.textContent = ''; status.className = 'text-sm font-medium'; }
+      form.querySelectorAll<HTMLElement>('[data-error-for]').forEach((error) => { error.textContent = ''; });
+      modal.showModal();
+      form.querySelector<HTMLInputElement>('[name="fullName"]')?.focus();
+    });
+  });
+
+  modal?.querySelector<HTMLElement>('[data-modal-close]')?.addEventListener('click', () => modal.close());
+  modal?.addEventListener('click', (event) => { if (event.target === modal) modal.close(); });
+  modal?.addEventListener('close', () => opener?.focus());
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!submit || !status) return;
+    form.querySelectorAll<HTMLElement>('[data-error-for]').forEach((error) => { error.textContent = ''; });
+    const data = new FormData(form);
+    const payload: Record<string, unknown> = Object.fromEntries(data.entries());
+    payload.contactConsent = data.get('contactConsent') === 'on';
+    submit.disabled = true;
+    status.className = 'text-sm font-medium text-neutral-600';
+    status.textContent = 'Sending your response…';
+    try {
+      const response = await fetch('/api/forms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        Object.entries(result.errors ?? {}).forEach(([field, message]) => {
+          const error = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
+          if (error) error.textContent = String(message);
+        });
+        throw new Error(result.error ?? 'Please review your information.');
+      }
+      form.reset();
+      status.className = 'text-sm font-medium text-green-700';
+      status.textContent = `Your response was sent. Reference: ${result.reference}`;
+    } catch (error) {
+      status.className = 'text-sm font-medium text-red-700';
+      status.textContent = error instanceof Error ? error.message : 'We could not send your response. Please try again.';
+    } finally {
+      submit.disabled = false;
+    }
+  });
+</script>

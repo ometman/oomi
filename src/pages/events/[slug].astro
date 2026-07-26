@@ -1,0 +1,79 @@
+---
+import { Image } from 'astro:assets';
+import type { GetStaticPaths } from 'astro';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import EventCalendarActions from '../../components/events/EventCalendarActions.astro';
+import fallbackImage from '../../assets/plan-visit-community-hero.png';
+import { isPublicEvent, ministryEvents, type MinistryEvent } from '../../data/events';
+import { eventLabel, formatEventDate, formatEventTime } from '../../lib/events';
+
+export const getStaticPaths = (() =>
+  ministryEvents
+    .filter((event) => isPublicEvent(event) && event.eventPageEnabled)
+    .map((event) => ({ params: { slug: event.slug }, props: { event } }))
+) satisfies GetStaticPaths;
+
+interface Props { event: MinistryEvent; }
+const { event } = Astro.props;
+const blocked = ['CANCELLED', 'POSTPONED'].includes(event.status);
+const canPlan = ['PUBLISHED', 'REGISTRATION_OPEN'].includes(event.status);
+const eventLocation = event.locationName ?? event.locationArea ?? eventLabel(event.location);
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: event.title,
+  description: event.description,
+  startDate: `${event.date}T${event.startTime}:00+00:00`,
+  ...(event.endTime ? { endDate: `${event.endDate ?? event.date}T${event.endTime}:00+00:00` } : {}),
+  eventStatus: event.status === 'CANCELLED' ? 'https://schema.org/EventCancelled' : event.status === 'POSTPONED' ? 'https://schema.org/EventPostponed' : 'https://schema.org/EventScheduled',
+  eventAttendanceMode: event.format === 'ONLINE' ? 'https://schema.org/OnlineEventAttendanceMode' : event.format === 'HYBRID' ? 'https://schema.org/MixedEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode',
+  location: event.format === 'ONLINE' ? { '@type': 'VirtualLocation', url: `${Astro.site}events/${event.slug}` } : { '@type': 'Place', name: eventLocation },
+  url: `${Astro.site}events/${event.slug}`,
+};
+---
+
+<Layout title={`${event.title} | Omet Omeni Ministries`} description={event.description}>
+  <Header />
+  <main id="main-content">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
+    <section class="relative isolate overflow-hidden bg-neutral-950 text-white">
+      <div class="absolute inset-0 -z-10" aria-hidden="true">
+        {event.image ? <img src={event.image} alt="" class="h-full w-full object-cover opacity-45" /> : <Image src={fallbackImage} alt="" format="webp" quality={80} loading="eager" class="h-full w-full object-cover opacity-35" />}
+        <div class="absolute inset-0 bg-gradient-to-r from-neutral-950/95 via-primary-900/85 to-neutral-950/45"></div>
+      </div>
+      <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div class="max-w-4xl">
+          <div class="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wider"><span class="rounded-full bg-secondary-300 px-3 py-1 text-neutral-900">{eventLabel(event.category)}</span><span class="rounded-full bg-white/15 px-3 py-1">{eventLabel(event.format)}</span><span class="rounded-full bg-white/15 px-3 py-1">{eventLabel(event.status)}</span></div>
+          <h1 class="mt-6 text-4xl font-display font-bold sm:text-5xl">{event.title}</h1>
+          <p class="mt-6 max-w-3xl text-lg text-primary-50">{event.description}</p>
+        </div>
+      </div>
+    </section>
+
+    {blocked && <div class:list={['border-y px-4 py-4 text-center font-semibold', event.status === 'CANCELLED' ? 'border-red-200 bg-red-50 text-red-900' : 'border-amber-200 bg-amber-50 text-amber-900']} role="status">{event.status === 'CANCELLED' ? 'This event has been cancelled.' : 'This event has been postponed. Updated details will be published after confirmation.'}</div>}
+
+    <section class="bg-white py-20">
+      <div class="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
+        <article>
+          <h2 class="text-3xl font-display font-bold text-neutral-900">About this event</h2>
+          <div class="mt-6 space-y-5 leading-relaxed text-neutral-700"><p>{event.fullDescription ?? event.description}</p></div>
+          <div class="mt-10 grid gap-5 sm:grid-cols-2">
+            {event.childrenInfo && <div><h3 class="font-semibold text-neutral-900">Children and families</h3><p class="mt-2 text-neutral-600">{event.childrenInfo}</p></div>}
+            {event.accessibilityInfo && <div><h3 class="font-semibold text-neutral-900">Accessibility</h3><p class="mt-2 text-neutral-600">{event.accessibilityInfo}</p></div>}
+            {event.arrivalInfo && <div><h3 class="font-semibold text-neutral-900">Arrival guidance</h3><p class="mt-2 text-neutral-600">{event.arrivalInfo}</p></div>}
+          </div>
+        </article>
+        <aside class="rounded-2xl border border-primary-100 bg-primary-50/60 p-7">
+          <h2 class="text-xl font-semibold text-neutral-900">Event details</h2>
+          <dl class="mt-6 space-y-4 text-sm"><div><dt class="font-semibold text-neutral-900">Date</dt><dd class="mt-1 text-neutral-700">{formatEventDate(event)}</dd></div><div><dt class="font-semibold text-neutral-900">Time</dt><dd class="mt-1 text-neutral-700">{formatEventTime(event)} · Ghana time</dd></div><div><dt class="font-semibold text-neutral-900">Location</dt><dd class="mt-1 text-neutral-700">{eventLocation}</dd></div><div><dt class="font-semibold text-neutral-900">Format</dt><dd class="mt-1 text-neutral-700">{eventLabel(event.format)}</dd></div>{event.costLabel && <div><dt class="font-semibold text-neutral-900">Cost</dt><dd class="mt-1 text-neutral-700">{event.costLabel}</dd></div>}</dl>
+          <div class="mt-7 space-y-3">{canPlan && event.format === 'ONLINE' && event.onlineUrl ? <a href={event.onlineUrl} class="block rounded-lg bg-primary-800 px-5 py-3 text-center font-semibold text-white">Join Online</a> : canPlan && event.registrationStatus === 'OPEN' && event.registrationUrl ? <a href={event.registrationUrl} class="block rounded-lg bg-primary-800 px-5 py-3 text-center font-semibold text-white">Register</a> : canPlan && <a href={`/plan-your-visit?event=${event.slug}`} class="block rounded-lg bg-primary-800 px-5 py-3 text-center font-semibold text-white">Plan to Attend</a>}</div>
+          <div class="mt-6"><EventCalendarActions event={event} /></div>
+          <a href="/contact" class="mt-7 inline-flex font-semibold text-primary-800 underline">Contact the ministry about this event</a>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
