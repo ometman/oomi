@@ -1,0 +1,148 @@
+import type { Ministry, MinistryCategory, MinistryLocation, MinistryStatus } from '../types/ministry';
+
+export const categoryLabels: Record<MinistryCategory, string> = {
+  CORE_MINISTRY: 'Core Ministry',
+  SERVICE_TEAM: 'Service Team',
+  OPERATIONAL_TEAM: 'Operational Team',
+};
+
+export const locationLabels: Record<MinistryLocation, string> = {
+  ACCRA: 'Accra',
+  KUMASI: 'Kumasi',
+  ONLINE: 'Online',
+  FLEXIBLE: 'Flexible',
+};
+
+export const statusLabels: Record<MinistryStatus, string> = {
+  PUBLIC_PROGRAMME: 'Public Programme',
+  ACCEPTING_INTEREST: 'Accepting Interest',
+  TRAINING_REQUIRED: 'Training Required',
+  NOT_RECRUITING: 'Not Currently Recruiting',
+  ONLINE_AVAILABLE: 'Online Available',
+};
+
+export const ministries: Ministry[] = [
+  {
+    title: 'Biblical Teaching Ministry', slug: 'biblical-teaching', category: 'CORE_MINISTRY',
+    description: 'Proclaiming and applying the Word of God through sermons, broadcasts, seminars and practical teaching resources.',
+    fullDescription: 'Biblical Teaching Ministry helps people understand Scripture and apply it faithfully through approved public programmes and digital resources.',
+    focus: 'Scripture and Christian growth', format: 'Accra, Kumasi and Online',
+    locations: ['ACCRA', 'KUMASI', 'ONLINE'], participationLabel: 'Open programme',
+    activities: ['Sermon broadcasts', 'Bible teaching sessions', 'Teaching seminars', 'Digital resources', 'Online study sessions'],
+    featured: true, status: 'PUBLIC_PROGRAMME', image: '/images/programmes/sunday-online-teaching-broadcast.png', thumbnail: '/images/ministries/mins1.png',
+    relatedEventSlugs: ['sunday-online-teaching-broadcast'], relatedSermonSlugs: ['Grace-JP-2026'], acceptingVolunteers: false,
+  },
+  {
+    title: 'Prayer and Worship Ministry', slug: 'prayer-and-worship', category: 'CORE_MINISTRY',
+    description: 'Leading believers in prayer, worship, intercession and spiritually responsible ministry.',
+    fullDescription: 'Prayer and Worship Ministry creates biblically responsible opportunities for believers to pray, worship and receive spiritual encouragement in person and online.',
+    focus: 'Prayer, worship and intercession', format: 'In person and online',
+    locations: ['ACCRA', 'KUMASI', 'ONLINE'], participationLabel: 'Open programme',
+    activities: ['Battle of Champions', 'Prayer and Worship Encounters', 'Intercessory prayer', 'Worship gatherings', 'Prayer support'],
+    featured: true, status: 'PUBLIC_PROGRAMME', image: '/images/programmes/battle-of-champions.png', thumbnail: '/images/ministries/mins2.png',
+    relatedEventSlugs: ['battle-of-champions', 'city-awakening-campaign'], relatedSermonSlugs: [], acceptingVolunteers: true, safeguardingRequired: true,
+  },
+  {
+    title: 'Discipleship', slug: 'discipleship', category: 'CORE_MINISTRY',
+    description: 'Helping believers mature in Christ through biblical foundations, spiritual formation and practical next steps.',
+    fullDescription: 'Discipleship supports Christian growth through structured teaching, spiritual formation and clear next steps into faithful service.',
+    focus: 'Christian formation and maturity', format: 'Online and selected programmes',
+    locations: ['ACCRA', 'KUMASI', 'ONLINE'], participationLabel: 'Open programme',
+    activities: ['Discipleship Masterclass', 'Christian foundations', 'Spiritual formation', 'Purpose and service'],
+    featured: false, status: 'ONLINE_AVAILABLE', image: '/images/programmes/discipleship-masterclass.png', thumbnail: '/images/ministries/mins3.png',
+    relatedEventSlugs: ['discipleship-masterclass'], relatedSermonSlugs: [], acceptingVolunteers: false,
+  },
+  {
+    title: 'Leadership Development', slug: 'leadership-development', category: 'CORE_MINISTRY',
+    description: 'Equipping pastors, ministry workers, professionals and emerging leaders to lead with wisdom, character and purpose.',
+    fullDescription: 'Leadership Development offers biblically grounded formation for people called to lead with character, wisdom and a posture of service.',
+    focus: 'Leadership and mentoring', format: 'Hybrid',
+    locations: ['ACCRA', 'KUMASI', 'ONLINE'], participationLabel: 'Application required',
+    activities: ['Kingdom Leadership Forum', 'Leadership summits', 'Workshops', 'Mentoring', 'Ministry strategy sessions'],
+    featured: true, status: 'ACCEPTING_INTEREST', image: '/images/programmes/kingdom-leadership-forum.png', thumbnail: '/images/ministries/mins4.png',
+    relatedEventSlugs: ['kingdom-leadership-forum', 'regional-leadership-summit'], relatedSermonSlugs: [], acceptingVolunteers: false,
+  },
+  {
+    title: 'Outreach and Missions', slug: 'outreach-and-missions', category: 'CORE_MINISTRY',
+    description: 'Sharing the love and truth of Jesus Christ through practical community engagement and mission-focused programmes.',
+    fullDescription: 'Outreach and Missions supports approved community engagement, evangelism logistics and practical expressions of Christian care.',
+    focus: 'Community engagement and mission', format: 'Accra and Kumasi programmes',
+    locations: ['ACCRA', 'KUMASI'], participationLabel: 'Open programme',
+    activities: ['Community engagement', 'Evangelism support', 'Mission programmes', 'Practical outreach'],
+    featured: false, status: 'PUBLIC_PROGRAMME', image: '/images/events/awakening-campaign-thumbnail.png', thumbnail: '/images/ministries/mins5.png',
+    relatedEventSlugs: ['city-awakening-campaign'], relatedSermonSlugs: [], acceptingVolunteers: true,
+  },
+  {
+    title: 'Digital Ministry', slug: 'digital-ministry', category: 'CORE_MINISTRY',
+    description: 'Extending biblical teaching, prayer and discipleship through broadcasts, podcasts, online programmes and digital communities.',
+    fullDescription: 'Digital Ministry makes approved teaching, prayer and discipleship accessible beyond physical locations through online programmes and media.',
+    focus: 'Online ministry and media', format: 'Online',
+    locations: ['ONLINE'], participationLabel: 'Online access',
+    activities: ['Sunday Online Teaching Broadcast', 'Livestreams', 'Podcasts', 'Online discipleship', 'Digital prayer programmes'],
+    featured: false, status: 'ONLINE_AVAILABLE', image: '/images/programmes/sunday-online-teaching-broadcast.png', thumbnail: '/images/ministries/mins6.png',
+    relatedEventSlugs: ['sunday-online-teaching-broadcast'], relatedSermonSlugs: ['Grace-JP-2026'], acceptingVolunteers: true,
+  },
+  {
+    title: 'Media and Production', slug: 'media-and-production', category: 'SERVICE_TEAM',
+    description: 'Supporting livestreaming, sound, video, photography and event production for approved programmes.',
+    fullDescription: 'This service team supports reliable, accessible ministry delivery through media and event production.',
+    focus: 'Media production and technical delivery', format: 'Flexible',
+    locations: ['ACCRA', 'KUMASI', 'ONLINE', 'FLEXIBLE'], participationLabel: 'Volunteer role',
+    activities: ['Livestream support', 'Sound and video', 'Photography', 'Event production'],
+    featured: false, status: 'TRAINING_REQUIRED', image: '/images/programmes/sunday-online-teaching-broadcast.png', thumbnail: '/images/ministries/mins7.png',
+    relatedEventSlugs: [], relatedSermonSlugs: [], acceptingVolunteers: true,
+  },
+  {
+    title: 'Communications', slug: 'communications', category: 'SERVICE_TEAM',
+    description: 'Supporting website content, newsletters, event promotion and responsible digital communication.',
+    fullDescription: 'The Communications team helps people discover ministry programmes and understand safe, clear next steps.',
+    focus: 'Content and digital communication', format: 'Flexible or online',
+    locations: ['ACCRA', 'KUMASI', 'ONLINE', 'FLEXIBLE'], participationLabel: 'Application required',
+    activities: ['Website content', 'Social media', 'Newsletters', 'Event promotion'],
+    featured: false, status: 'ACCEPTING_INTEREST', image: '/images/events/leadership-summit-thumbnail.png', thumbnail: '/images/ministries/mins8.png',
+    relatedEventSlugs: [], relatedSermonSlugs: [], acceptingVolunteers: true,
+  },
+  {
+    title: 'Hospitality and Events', slug: 'hospitality-and-events', category: 'SERVICE_TEAM',
+    description: 'Supporting registration, guest welcome, seating, preparation and visitor guidance.',
+    fullDescription: 'Hospitality and Events helps create a warm, organised and accessible atmosphere at confirmed programmes.',
+    focus: 'Guest care and event support', format: 'Event-based',
+    locations: ['ACCRA', 'KUMASI'], participationLabel: 'Volunteer role',
+    activities: ['Guest welcome', 'Registration', 'Seating support', 'Event preparation'],
+    featured: false, status: 'ACCEPTING_INTEREST', image: '/images/events/awakening-campaign-thumbnail.png', thumbnail: '/images/ministries/mins9.png',
+    relatedEventSlugs: [], relatedSermonSlugs: [], acceptingVolunteers: true,
+  },
+  {
+    title: 'Administration', slug: 'administration', category: 'OPERATIONAL_TEAM',
+    description: 'Supporting programme coordination, records, scheduling, follow-up and office administration.',
+    fullDescription: 'Administration provides careful operational support for approved programmes and ministry follow-up.',
+    focus: 'Coordination and administration', format: 'Flexible or office-based',
+    locations: ['ACCRA', 'KUMASI', 'FLEXIBLE'], participationLabel: 'Application required',
+    activities: ['Programme coordination', 'Scheduling', 'Records', 'Approved follow-up'],
+    featured: false, status: 'ACCEPTING_INTEREST', image: '/images/events/leadership-summit-thumbnail.png', thumbnail: '/images/ministries/mins1.png',
+    relatedEventSlugs: [], relatedSermonSlugs: [], acceptingVolunteers: true,
+  },
+  {
+    title: 'Prayer Support', slug: 'prayer-support', category: 'SERVICE_TEAM',
+    description: 'Supporting approved prayer follow-up, intercession and programme prayer with discretion.',
+    fullDescription: 'Prayer Support serves within approved safeguarding, confidentiality and spiritual-oversight processes.',
+    focus: 'Prayer follow-up and intercession', format: 'Flexible',
+    locations: ['ACCRA', 'KUMASI', 'ONLINE', 'FLEXIBLE'], participationLabel: 'Application required',
+    activities: ['Programme prayer', 'Intercession', 'Approved prayer follow-up'],
+    featured: false, status: 'TRAINING_REQUIRED', image: '/images/programmes/battle-of-champions.png', thumbnail: '/images/ministries/mins2.png',
+    relatedEventSlugs: ['battle-of-champions'], relatedSermonSlugs: [], acceptingVolunteers: true, safeguardingRequired: true,
+  },
+  {
+    title: 'Outreach Support', slug: 'outreach-support', category: 'OPERATIONAL_TEAM',
+    description: 'Supporting community engagement, evangelism logistics and practical outreach.',
+    fullDescription: 'Outreach Support helps approved community and mission programmes run safely and effectively.',
+    focus: 'Outreach logistics and support', format: 'Event-based',
+    locations: ['ACCRA', 'KUMASI', 'FLEXIBLE'], participationLabel: 'Volunteer role',
+    activities: ['Outreach logistics', 'Community engagement', 'Team support'],
+    featured: false, status: 'ACCEPTING_INTEREST', image: '/images/events/awakening-campaign-thumbnail.png', thumbnail: '/images/ministries/mins3.png',
+    relatedEventSlugs: [], relatedSermonSlugs: [], acceptingVolunteers: true,
+  },
+];
+
+export const featuredMinistries = ministries.filter((ministry) => ministry.featured);
+export const getMinistry = (slug: string) => ministries.find((ministry) => ministry.slug === slug);
