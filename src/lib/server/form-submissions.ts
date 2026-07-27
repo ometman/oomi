@@ -58,15 +58,30 @@ function prepareContact(input: Record<string, unknown>): PreparationResult {
 }
 
 function prepareMinistryInterest(input: Record<string, unknown>): PreparationResult {
-  const fullName = text(input.fullName ?? input['full-name'], 160);
+  const firstName = text(input.firstName, 80);
+  const lastName = text(input.lastName, 80);
   const email = text(input.email, 254);
-  const ageGroup = text(input.ageGroup ?? input['age-group'], 20);
-  const interest = text(input.ministryInterest ?? input['ministry-interest'], 160);
+  const phone = text(input.phone, 40);
+  const interest = text(input.ministryInterest, 80);
+  const location = text(input.locationPreference, 20);
+  const contactMethod = text(input.preferredContactMethod, 20);
+  const allowedInterests = [
+    'biblical-teaching', 'prayer-and-worship', 'discipleship', 'leadership-development',
+    'outreach-and-missions', 'digital-ministry', 'media-and-production', 'communications',
+    'hospitality-and-events', 'administration', 'prayer-support', 'outreach-support',
+    'event-and-hospitality-support', 'media-and-technical-support', 'communications-and-content',
+    'administrative-support', 'not-sure',
+  ];
+  const allowedLocations = ['Accra', 'Kumasi', 'Online', 'Flexible', 'Other'];
+  const allowedContactMethods = ['WhatsApp', 'Phone', 'Email'];
   const errors: Record<string, string> = {};
-  if (!fullName) errors.fullName = 'Enter your full name.';
+  if (!firstName) errors.firstName = 'Enter your first name.';
+  if (!lastName) errors.lastName = 'Enter your last name.';
   if (!emailPattern.test(email)) errors.email = 'Enter a valid email address.';
-  if (!ageGroup) errors.ageGroup = 'Choose an age group.';
-  if (!interest) errors.ministryInterest = 'Choose a ministry interest.';
+  if (!allowedInterests.includes(interest)) errors.ministryInterest = 'Choose a valid ministry interest.';
+  if (!allowedLocations.includes(location)) errors.locationPreference = 'Choose a valid location preference.';
+  if (!allowedContactMethods.includes(contactMethod)) errors.preferredContactMethod = 'Choose a valid contact method.';
+  if (!checked(input.placementAcknowledgement)) errors.placementAcknowledgement = 'Acknowledge that placement is not guaranteed.';
   if (!checked(input.contactConsent)) errors.contactConsent = 'Consent to respond is required.';
   if (Object.keys(errors).length) return { valid: false, errors };
   return {
@@ -76,9 +91,12 @@ function prepareMinistryInterest(input: Record<string, unknown>): PreparationRes
       subject: '[Ministry Interest] New ministry interest',
       replyTo: email,
       text: lines([
-        ['Full name', fullName], ['Email', email], ['Phone', input.phone], ['Age group', ageGroup],
-        ['Ministry interest', interest], ['Skills and talents', input.skills],
+        ['First name', firstName], ['Last name', lastName], ['Email', email], ['Phone or WhatsApp', phone],
+        ['Preferred contact method', contactMethod], ['Location preference', location],
+        ['Ministry interest', interest], ['Skills and experience', input.skills],
         ['Availability', input.availability], ['Additional information', input.message],
+        ['Placement acknowledgement', 'Yes'], ['Contact consent', 'Yes'],
+        ['General ministry updates requested', checked(input.newsletter) ? 'Yes — separate consent recorded; no automatic subscription' : 'No'],
       ]),
     },
   };
