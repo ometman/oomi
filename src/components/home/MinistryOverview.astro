@@ -2,20 +2,48 @@
 import { ministryAreas } from '../../data/ministry-areas';
 ---
 
-<section class="bg-neutral-50 py-20 sm:py-24" aria-labelledby="ministries-overview-heading">
+<section class="relative isolate overflow-hidden bg-primary-900 py-20 text-white sm:py-24" aria-labelledby="ministries-overview-heading">
+  <img src="/images/home/oom-min-area-1.png" alt="" width="1680" height="945" loading="lazy" class="absolute inset-0 -z-20 h-full w-full object-cover object-center opacity-25 saturate-50" />
+  <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-secondary-300/80 to-transparent" aria-hidden="true"></div>
+  <div class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-secondary-300/80 to-transparent" aria-hidden="true"></div>
+
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="max-w-3xl"><p class="text-sm font-semibold uppercase tracking-[0.2em] text-secondary-700">Grow and serve</p><h2 id="ministries-overview-heading" class="mt-3 text-3xl font-display font-bold text-neutral-900 sm:text-4xl">Ministry areas</h2><p class="mt-4 text-lg leading-relaxed text-neutral-600">Explore ways to receive biblical formation, connect in prayer and participate in kingdom-focused service.</p></div>
+    <div class="max-w-3xl">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-secondary-300">Grow and serve</p>
+      <h2 id="ministries-overview-heading" class="mt-3 text-3xl font-display font-bold text-white sm:text-4xl">Ministry areas</h2>
+      <p class="mt-4 text-lg leading-relaxed text-primary-100">Explore ways to receive biblical formation, connect in prayer and participate in kingdom-focused service.</p>
+    </div>
+
     <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {ministryAreas.map((ministry) => (
-        <article class="rounded-2xl border border-neutral-200 bg-white p-7 shadow-sm">
-          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary-100 text-secondary-800">
+      {ministryAreas.map((ministry, index) => (
+        <article
+          class="ministry-area-card flex flex-col rounded-2xl border border-neutral-200/80 bg-white p-7 text-neutral-900 shadow-[0_14px_32px_rgba(10,25,55,0.28)]"
+          style={`--card-delay: ${index * 80}ms`}
+        >
+          <div class="flex h-11 w-11 items-center justify-center rounded-xl border border-secondary-300/60 bg-primary-900 text-secondary-300 shadow-sm">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d={ministry.iconPath}></path></svg>
           </div>
           <h3 class="mt-5 text-xl font-semibold text-neutral-900">{ministry.name}</h3>
-          <p class="mt-3 leading-relaxed text-neutral-600">{ministry.description}</p>
-          <a href="/ministries" class="mt-5 inline-flex font-semibold text-primary-800 underline decoration-secondary-500 underline-offset-4">Learn More about {ministry.name}</a>
+          <p class="mt-3 flex-1 leading-relaxed text-neutral-600">{ministry.description}</p>
+          <a href="/ministries" class="mt-5 inline-flex font-semibold text-primary-800 underline decoration-secondary-500 underline-offset-4 focus:outline-none focus:ring-2 focus:ring-primary-600">Learn More about {ministry.name}</a>
         </article>
       ))}
     </div>
   </div>
 </section>
+
+<style>
+  .ministry-area-card {
+    animation: ministry-area-enter 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--card-delay);
+  }
+
+  @keyframes ministry-area-enter {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ministry-area-card { animation: none; }
+  }
+</style>

@@ -5,6 +5,33 @@ const pillars = [
   ['Discipleship', 'We help believers grow in Christ, mature in faith and fulfil their God-given purpose.', 'M17 20h5v-2a3 3 0 00-5.4-1.9M17 20H7m10 0v-2a5 5 0 00-10 0v2m0 0H2v-2a3 3 0 015.4-1.9M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
   ['Kingdom Impact', 'We reach communities and nations with the love and power of Jesus Christ.', 'M12 21a9 9 0 100-18 9 9 0 000 18zm0 0c2.2-2.5 3.4-5.5 3.4-9S14.2 5.5 12 3m0 18c-2.2-2.5-3.4-5.5-3.4-9S9.8 5.5 12 3M3.5 9h17M3.5 15h17'],
 ];
+
+const cardStyles = [
+  {
+    card: 'border-primary-800 bg-primary-900',
+    icon: 'border-primary-300/25 bg-white/10 text-secondary-300',
+    number: 'text-secondary-300',
+    body: 'text-primary-100',
+  },
+  {
+    card: 'border-secondary-800 bg-secondary-700',
+    icon: 'border-secondary-200/30 bg-neutral-950/15 text-secondary-100',
+    number: 'text-secondary-100',
+    body: 'text-secondary-50',
+  },
+  {
+    card: 'border-neutral-800 bg-neutral-900',
+    icon: 'border-neutral-500/40 bg-primary-700 text-secondary-300',
+    number: 'text-secondary-300',
+    body: 'text-neutral-200',
+  },
+  {
+    card: 'border-primary-700 bg-primary-600',
+    icon: 'border-primary-200/30 bg-neutral-950/15 text-secondary-200',
+    number: 'text-secondary-200',
+    body: 'text-primary-50',
+  },
+] as const;
 ---
 
 <section class="bg-white py-20 sm:py-24" aria-labelledby="pillars-heading">
@@ -15,13 +42,13 @@ const pillars = [
     </div>
     <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {pillars.map(([title, description, path], index) => (
-        <article class="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 shadow-sm">
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-900 text-secondary-300">
+        <article class={`rounded-2xl border p-6 text-white shadow-lg ${cardStyles[index].card}`}>
+          <div class={`flex h-12 w-12 items-center justify-center rounded-xl border ${cardStyles[index].icon}`}>
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d={path}></path></svg>
           </div>
-          <p class="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-secondary-700">0{index + 1}</p>
-          <h3 class="mt-2 text-xl font-semibold text-neutral-900">{title}</h3>
-          <p class="mt-3 leading-relaxed text-neutral-600">{description}</p>
+          <p class={`mt-6 text-xs font-bold uppercase tracking-[0.18em] ${cardStyles[index].number}`}>0{index + 1}</p>
+          <h3 class="mt-2 text-xl font-semibold text-white">{title}</h3>
+          <p class={`mt-3 leading-relaxed ${cardStyles[index].body}`}>{description}</p>
         </article>
       ))}
     </div>
