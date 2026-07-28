@@ -1,4 +1,6 @@
 ---
+import CardReveal from '../components/CardReveal.astro';
+
 export interface Props {
   title: string;
   description?: string;
@@ -62,6 +64,7 @@ const socialImageUrl = new URL(image, Astro.site ?? Astro.url.origin);
   </head>
   <body class="font-sans text-neutral-800 bg-white">
     <slot />
+    <CardReveal />
     
     <!-- Scroll to Top Button -->
     <button id="scroll-to-top" class="fixed bottom-6 right-6 bg-primary-600 text-white p-3 rounded-full shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-primary-700 z-50">
