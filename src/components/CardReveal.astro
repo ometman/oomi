@@ -1,0 +1,53 @@
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const selector = [
+    'article[class*="rounded-"]',
+    ':not(.connect-card)',
+    ':not(.upcoming-card)',
+    ':not(.ministry-area-card)',
+  ].join('');
+  const cards = Array.from(document.querySelectorAll<HTMLElement>(selector));
+
+  if (cards.length && !reduceMotion) {
+    document.documentElement.classList.add('has-site-card-reveal');
+
+    cards.forEach((card, index) => {
+      card.classList.add('site-reveal-card');
+      card.style.setProperty('--site-reveal-delay', `${(index % 4) * 75}ms`);
+    });
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-site-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+
+      cards.forEach((card) => observer.observe(card));
+    } else {
+      cards.forEach((card) => card.classList.add('is-site-visible'));
+    }
+  }
+</script>
+
+<style is:global>
+  @media (prefers-reduced-motion: no-preference) {
+    .has-site-card-reveal .site-reveal-card {
+      opacity: 0;
+      transform: translateY(20px) scale(0.99);
+    }
+
+    .has-site-card-reveal .site-reveal-card.is-site-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition:
+        opacity 625ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 625ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 300ms ease;
+      transition-delay: var(--site-reveal-delay, 0ms);
+    }
+  }
+</style>
