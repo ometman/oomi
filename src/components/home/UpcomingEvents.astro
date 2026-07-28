@@ -4,13 +4,36 @@ interface Props { events: MinistryEvent[]; }
 const { events } = Astro.props;
 const label = (value: string) => value.replaceAll('_', ' ').toLowerCase().replace(/\b\w/g, (character) => character.toUpperCase());
 const date = (value: string) => new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${value}T12:00:00Z`));
+const programmeActions = [
+  {
+    title: 'Explore Programmes',
+    description: 'Discover confirmed gatherings, recurring programmes and ways to participate.',
+    href: '/events',
+    image: '/images/home/events.png',
+    icon: 'M8 2v3m8-3v3M3 9h18M5 4h14a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z',
+  },
+  {
+    title: 'Explore Sermons',
+    description: 'Watch and listen to biblical teaching for faith, growth and everyday life.',
+    href: '/sermons',
+    image: '/images/home/sermon.png',
+    icon: 'M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2zm5 4l6 4-6 4V8z',
+  },
+  {
+    title: 'Subscribe Updates',
+    description: 'Receive selected ministry news and programme announcements.',
+    href: '#stay-connected',
+    image: '/images/home/oom-updates.png',
+    icon: 'M4 6h16v12H4V6zm0 1l8 6 8-6',
+  },
+] as const;
 ---
 
 <section class="bg-primary-900 py-20 text-white sm:py-24" aria-labelledby="upcoming-events-heading">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-      <div><p class="text-sm font-semibold uppercase tracking-[0.2em] text-secondary-300">Gather and grow</p><h2 id="upcoming-events-heading" class="mt-3 text-3xl font-display font-bold sm:text-4xl">Upcoming programmes</h2></div>
-      <a href="/events" class="font-semibold text-secondary-200 underline decoration-secondary-400 underline-offset-4 focus:outline-none focus:ring-2 focus:ring-secondary-200">View All Events</a>
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-secondary-300">Gather and grow</p>
+      <h2 id="upcoming-events-heading" class="mt-3 text-3xl font-display font-bold sm:text-4xl">What’s Up at OOM?</h2>
     </div>
     {events.length ? (
       <div class="mt-12 grid gap-6 lg:grid-cols-3">
@@ -25,10 +48,24 @@ const date = (value: string) => new Intl.DateTimeFormat('en-GB', { day: 'numeric
         ))}
       </div>
     ) : (
-      <div class="mt-12 rounded-2xl border border-white/15 bg-white/10 p-8 text-primary-50">
-        <h3 class="text-xl font-semibold text-white">No upcoming events are currently published.</h3>
-        <p class="mt-3">Explore our sermons or subscribe for ministry updates.</p>
-        <div class="mt-6 flex flex-wrap gap-5"><a href="/sermons" class="font-semibold text-secondary-200 underline underline-offset-4">Explore Sermons</a><a href="#stay-connected" class="font-semibold text-secondary-200 underline underline-offset-4">Subscribe for Updates</a></div>
+      <div class="mt-12 grid gap-6 md:grid-cols-3">
+        {programmeActions.map((action) => (
+          <a
+            href={action.href}
+            class="group relative isolate flex min-h-72 flex-col overflow-hidden rounded-2xl border border-white/20 p-7 text-primary-50 shadow-lg transition duration-200 hover:-translate-y-1 hover:border-secondary-300/70 focus:outline-none focus:ring-2 focus:ring-secondary-200 focus:ring-offset-2 focus:ring-offset-primary-900 motion-reduce:transform-none"
+          >
+            <img src={action.image} alt="" width="720" height="405" loading="lazy" class="absolute inset-0 -z-20 h-full w-full object-cover transition duration-500 group-hover:scale-105 motion-reduce:transform-none" />
+            <span class="absolute inset-0 -z-10 bg-gradient-to-t from-neutral-950 via-neutral-950/75 to-neutral-950/35" aria-hidden="true"></span>
+            <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary-300 text-neutral-900 transition-colors group-hover:bg-secondary-200" aria-hidden="true">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={action.icon}></path></svg>
+            </span>
+            <h3 class="mt-6 text-xl font-semibold text-white">{action.title}</h3>
+            <p class="mt-3 flex-1 leading-relaxed text-neutral-100">{action.description}</p>
+            <span class="mt-6 inline-flex items-center font-semibold text-secondary-200">
+              Continue <span class="ml-2 transition-transform group-hover:translate-x-1 motion-reduce:transform-none" aria-hidden="true">→</span>
+            </span>
+          </a>
+        ))}
       </div>
     )}
   </div>
